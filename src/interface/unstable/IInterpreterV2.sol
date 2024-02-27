@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {EncodedDispatch, StateNamespace, Operand, DEFAULT_STATE_NAMESPACE} from "../deprecated/IInterpreterV1.sol";
-import {FullyQualifiedNamespace, IInterpreterStoreV1} from "../IInterpreterStoreV1.sol";
+import {FullyQualifiedNamespace, IInterpreterStoreV2} from "./IInterpreterStoreV2.sol";
 
 /// @dev For maximum compatibility with external contracts, the `IInterpreterV2`
 /// should implement an opcode that reads from the stack by index as opcode `0`.
@@ -148,7 +148,7 @@ interface IInterpreterV2 {
     /// will be pairwise key/value items but this is not strictly required if
     /// some store expects some other format.
     function eval2(
-        IInterpreterStoreV1 store,
+        IInterpreterStoreV2 store,
         FullyQualifiedNamespace namespace,
         EncodedDispatch dispatch,
         uint256[][] calldata context,
