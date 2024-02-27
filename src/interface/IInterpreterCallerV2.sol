@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IExpressionDeployerV3} from "./unstable/IExpressionDeployerV3.sol";
-import {IInterpreterStoreV1} from "./IInterpreterStoreV1.sol";
+import {IInterpreterStoreV2} from "./unstable/IInterpreterStoreV2.sol";
 import {IInterpreterV2} from "./unstable/IInterpreterV2.sol";
 
 /// Standard struct that can be embedded in ABIs in a consistent format for
@@ -25,7 +25,7 @@ struct EvaluableConfigV3 {
 /// @param expression Will be evaluated by the interpreter.
 struct EvaluableV2 {
     IInterpreterV2 interpreter;
-    IInterpreterStoreV1 store;
+    IInterpreterStoreV2 store;
     address expression;
 }
 
