@@ -2,12 +2,18 @@
 pragma solidity ^0.8.18;
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-import {LibHashNoAlloc} from "rain.lib.hash/LibHashNoAlloc.sol";
+import {LibHashNoAlloc, HASH_NIL} from "rain.lib.hash/LibHashNoAlloc.sol";
 
 import {SignatureChecker} from "openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
 import {ECDSA} from "openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 
-import {IInterpreterCallerV2} from "../../interface/IInterpreterCallerV2.sol";
+import {
+    IInterpreterCallerV2,
+    SignedContextV1,
+    SIGNED_CONTEXT_SIGNER_OFFSET,
+    SIGNED_CONTEXT_SIGNATURE_OFFSET,
+    SIGNED_CONTEXT_CONTEXT_OFFSET
+} from "../../interface/IInterpreterCallerV2.sol";
 
 /// Thrown when the ith signature from a list of signed contexts is invalid.
 error InvalidSignature(uint256 i);
