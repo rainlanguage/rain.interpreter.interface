@@ -13,8 +13,9 @@ jobs:
       DEPLOYMENT_KEY: ${{ github.ref == 'refs/heads/main' && secrets.PRIVATE_KEY || secrets.PRIVATE_KEY_DEV }}
     steps:
       - uses: actions/checkout@v4
-        submodules: recursive
-        fetch-depth: 0
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
       - uses: DeterminateSystems/nix-installer-action@v4
       - uses: DeterminateSystems/magic-nix-cache-action@v2
