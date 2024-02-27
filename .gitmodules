@@ -7,3 +7,6 @@
 [submodule "lib/rain.lib.typecast"]
 	path = lib/rain.lib.typecast
 	url = https://github.com/rainlanguage/rain.lib.typecast
+[submodule "lib/rain.lib.hash"]
+	path = lib/rain.lib.hash
+	url = https://github.com/rainlanguage/rain.lib.hash
