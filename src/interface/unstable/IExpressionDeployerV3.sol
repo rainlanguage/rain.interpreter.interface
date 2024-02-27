@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IInterpreterStoreV1} from "../IInterpreterStoreV1.sol";
+import {IInterpreterStoreV2} from "./IInterpreterStoreV2.sol";
 import {IInterpreterV2} from "./IInterpreterV2.sol";
 
 string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V3 = "IExpressionDeployerV3";
@@ -50,7 +50,7 @@ interface IExpressionDeployerV3 {
     /// @param expression As per `IExpressionDeployerV3.deployExpression2` return.
     /// @param io As per `IExpressionDeployerV3.deployExpression2` return.
     event DeployedExpression(
-        address sender, IInterpreterV2 interpreter, IInterpreterStoreV1 store, address expression, bytes io
+        address sender, IInterpreterV2 interpreter, IInterpreterStoreV2 store, address expression, bytes io
     );
 
     /// This is the literal InterpreterOpMeta bytes to be used offchain to make
@@ -136,5 +136,5 @@ interface IExpressionDeployerV3 {
     /// guarantee that the bytecode is valid.
     function deployExpression2(bytes calldata bytecode, uint256[] calldata constants)
         external
-        returns (IInterpreterV2 interpreter, IInterpreterStoreV1 store, address expression, bytes calldata io);
+        returns (IInterpreterV2 interpreter, IInterpreterStoreV2 store, address expression, bytes calldata io);
 }
