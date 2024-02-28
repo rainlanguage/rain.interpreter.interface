@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 
 abstract contract BytecodeTest is Test {
-    function conformBytecode(bytes memory bytecode, uint256 sourceCount, bytes32 seed) internal view {
+    function conformBytecode(bytes memory bytecode, uint256 sourceCount, bytes32 seed) internal pure {
         unchecked {
             if (bytecode.length > 0) {
                 // Max source count would be treating all the bytecode as empty sources.
