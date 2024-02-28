@@ -14,7 +14,7 @@ import {
 
 contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
     /// Test that all conforming bytecodes pass.
-    function testCheckNoOOBPointersConforming(bytes memory bytecode, uint256 sourceCount, bytes32 seed) external view {
+    function testCheckNoOOBPointersConforming(bytes memory bytecode, uint256 sourceCount, bytes32 seed) external pure {
         conformBytecode(bytecode, sourceCount, seed);
         LibBytecode.checkNoOOBPointers(bytecode);
     }
