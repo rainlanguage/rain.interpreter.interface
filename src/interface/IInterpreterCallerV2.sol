@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IExpressionDeployerV3} from "./unstable/IExpressionDeployerV3.sol";
-import {IInterpreterStoreV2} from "./unstable/IInterpreterStoreV2.sol";
-import {IInterpreterV2} from "./unstable/IInterpreterV2.sol";
+import {IExpressionDeployerV3} from "./IExpressionDeployerV3.sol";
+import {IInterpreterStoreV2} from "./IInterpreterStoreV2.sol";
+import {IInterpreterV2} from "./IInterpreterV2.sol";
 
 /// Standard struct that can be embedded in ABIs in a consistent format for
 /// tooling to read/write. MAY be useful to bundle up the data required to call

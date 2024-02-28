@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 // Reexports for implementations to use.
-import {AuthoringMetaV2} from "../IParserV1.sol";
+import {AuthoringMetaV2} from "./IParserV1.sol";
 import {Operand} from "./IInterpreterV2.sol";
 
 /// @dev A compatibility version for the subparser interface.
