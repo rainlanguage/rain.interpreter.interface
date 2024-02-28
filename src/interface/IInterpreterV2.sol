@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {EncodedDispatch, StateNamespace, Operand, DEFAULT_STATE_NAMESPACE} from "../deprecated/IInterpreterV1.sol";
+import {EncodedDispatch, StateNamespace, Operand, DEFAULT_STATE_NAMESPACE} from "./deprecated/IInterpreterV1.sol";
 import {FullyQualifiedNamespace, IInterpreterStoreV2} from "./IInterpreterStoreV2.sol";
 
 /// @dev For maximum compatibility with external contracts, the `IInterpreterV2`

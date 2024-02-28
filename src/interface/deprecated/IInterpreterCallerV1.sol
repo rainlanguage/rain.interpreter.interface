@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {IExpressionDeployerV1} from "./IExpressionDeployerV1.sol";
 import {IExpressionDeployerV2} from "./IExpressionDeployerV2.sol";
 import {IInterpreterV1} from "./IInterpreterV1.sol";
-import {IInterpreterStoreV1} from "../IInterpreterStoreV1.sol";
+import {IInterpreterStoreV1} from "./IInterpreterStoreV1.sol";
 
 /// Standard struct that can be embedded in ABIs in a consistent format for
 /// tooling to read/write. MAY be useful to bundle up the data required to call

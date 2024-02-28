@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {StateNamespace, FullyQualifiedNamespace, NO_STORE} from "../IInterpreterStoreV1.sol";
+import {StateNamespace, FullyQualifiedNamespace, NO_STORE} from "./deprecated/IInterpreterStoreV1.sol";
 
 /// @title IInterpreterStoreV2
 /// @notice Tracks state changes on behalf of an interpreter. A single store can
