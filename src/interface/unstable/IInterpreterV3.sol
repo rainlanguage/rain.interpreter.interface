@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IInterpreterStoreV2, FullyQualifiedNamespace, StateNamespace, SourceIndexV2} from "../IInterpreterV2.sol";
+import {IInterpreterStoreV2, FullyQualifiedNamespace, StateNamespace, SourceIndexV2, DEFAULT_STATE_NAMESPACE} from "../IInterpreterV2.sol";
 
 interface IInterpreterV3 {
     function functionPointers() external view returns (bytes calldata);
