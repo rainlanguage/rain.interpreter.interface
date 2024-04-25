@@ -6,5 +6,5 @@ struct PragmaV1 {
 }
 
 interface IParserPragmaV1 {
-    function parsePragma1(bytes calldata data) external view returns (bytes calldata PragmaV1);
+    function parsePragma1(bytes calldata data) external view returns (PragmaV1 calldata);
 }
