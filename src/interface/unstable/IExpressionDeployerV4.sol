@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {IInterpreterStoreV2} from "../IInterpreterStoreV2.sol";
 import {IInterpreterV2} from "../IInterpreterV2.sol";
 
-string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V3 = "IExpressionDeployerV4";
+string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V4 = "IExpressionDeployerV4";
 
 /// @title IExpressionDeployerV4
 /// @notice Companion to `IInterpreterV2` responsible for onchain static code
