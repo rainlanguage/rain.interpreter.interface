@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {BytecodeTest} from "test/abstract/BytecodeTest.sol";
 import {
