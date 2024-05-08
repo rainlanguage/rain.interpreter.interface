@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {EvaluableV2} from "src/interface/IInterpreterCallerV2.sol";
 import {EvaluableV3} from "src/interface/unstable/IInterpreterCallerV3.sol";
