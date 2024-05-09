@@ -47,6 +47,24 @@ bytes32 constant COMPATIBLITY_V2 = keccak256("2023.12.28 Rainlang ISubParserV2")
 /// that the number of inputs and outputs must each be less than 16.
 bytes32 constant COMPATIBLITY_V3 = keccak256("2024.02.15 Rainlang ISubParserV3");
 
+/// @dev A compatibility version for the subparser interface.
+///
+/// Identical to COMPATIBLITY_V3, except the main parser now scales decimal
+/// literals to 18 fixed point decimals unconditionally. Other literals such as
+/// hex are unmodified by this change.
+///
+/// Values that are intended to be used as fixed point decimals are unaffected
+/// because the main parser is now simply better at parsing them.
+///
+/// Values that are intended to be used as integers, such as `1`, need to
+/// consider that the original literal may have parsed to
+/// e.g. either `1` or `1e18` as the user may have written `1` or `0x01` into the
+/// parsed source respectively.
+///
+/// Subparsers should be aware of this change and treat exact multiples of
+/// `1e18` as integers if and when it makes sense to.
+bytes32 constant COMPATIBLITY_V4 = keccak256("2024.05.9 Rainlang ISubParserV2");
+
 interface ISubParserV2 {
     /// The sub parser is being asked to attempt to parse a literal that the main
     /// parser has failed to parse. The sub parser MUST ONLY attempt to parse a
