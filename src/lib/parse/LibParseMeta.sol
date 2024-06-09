@@ -4,6 +4,9 @@ pragma solidity ^0.8.18;
 /// @dev 4 = 1 byte opcode index + 3 byte fingerprint
 uint256 constant META_ITEM_SIZE = 4;
 
+/// @dev 1 = 1 byte for depth
+uint256 constant META_PREFIX_SIZE = 1;
+
 /// @dev 0xFFFFFF = 3 byte fingerprint
 /// The fingerprint is 3 bytes because we're targetting the same collision
 /// resistance on words as solidity functions. As we already use a fully byte to
