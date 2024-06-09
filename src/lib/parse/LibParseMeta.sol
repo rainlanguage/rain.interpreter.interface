@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import { LibCtPop } from "rain.math.binary/lib/LibCtPop.sol";
+
 /// @dev 4 = 1 byte opcode index + 3 byte fingerprint
 uint256 constant META_ITEM_SIZE = 4;
 
@@ -35,6 +37,70 @@ library LibParseMeta {
             // low 3 bytes for the fingerprint.
             //slither-disable-next-line incorrect-shift
             bitmap := shl(byte(0, hashed), 1)
+        }
+    }
+
+    /// Given the parse meta and a word, return the index and io fn pointer for
+    /// the word. If the word is not found, then `exists` will be false. The
+    /// caller MUST check `exists` before using the other return values.
+    /// @param meta The parser meta.
+    /// @param word The word to lookup.
+    /// @return True if the word exists in the parse meta.
+    /// @return The index of the word in the parse meta.
+    function lookupWord(bytes memory meta, bytes32 word) internal pure returns (bool, uint256) {
+        unchecked {
+            uint256 dataStart;
+            uint256 cursor;
+            uint256 end;
+            {
+                uint256 metaExpansionSize = META_EXPANSION_SIZE;
+                uint256 metaItemSize = META_ITEM_SIZE;
+                assembly ("memory-safe") {
+                    // Read depth from first meta byte.
+                    cursor := add(meta, 1)
+                    let depth := and(mload(cursor), 0xFF)
+                    // 33 bytes per depth
+                    end := add(cursor, mul(depth, metaExpansionSize))
+                    dataStart := add(end, metaItemSize)
+                }
+            }
+
+            uint256 cumulativeCt = 0;
+            while (cursor < end) {
+                uint256 expansion;
+                uint256 posData;
+                uint256 wordFingerprint;
+                // Lookup the data at pos.
+                {
+                    uint256 seed;
+                    assembly ("memory-safe") {
+                        cursor := add(cursor, 1)
+                        seed := and(mload(cursor), 0xFF)
+                        cursor := add(cursor, 0x20)
+                        expansion := mload(cursor)
+                    }
+
+                    (uint256 shifted, uint256 hashed) = wordBitmapped(seed, word);
+                    uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativeCt;
+                    wordFingerprint = hashed & FINGERPRINT_MASK;
+                    uint256 metaItemSize = META_ITEM_SIZE;
+                    assembly ("memory-safe") {
+                        posData := mload(add(dataStart, mul(pos, metaItemSize)))
+                    }
+                }
+
+                // Match
+                if (wordFingerprint == posData & FINGERPRINT_MASK) {
+                    uint256 index;
+                    assembly ("memory-safe") {
+                        index := byte(28, posData)
+                    }
+                    return (true, index);
+                } else {
+                    cumulativeCt += LibCtPop.ctpop(expansion);
+                }
+            }
+            return (false, 0);
         }
     }
 }

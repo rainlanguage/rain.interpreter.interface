@@ -13,3 +13,6 @@
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "lib/rain.math.binary"]
+	path = lib/rain.math.binary
+	url = https://github.com/rainlanguage/rain.math.binary
