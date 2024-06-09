@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import { LibCtPop } from "rain.math.binary/lib/LibCtPop.sol";
+import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 
 /// @dev 4 = 1 byte opcode index + 3 byte fingerprint
 uint256 constant META_ITEM_SIZE = 4;
