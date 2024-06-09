@@ -16,6 +16,9 @@ uint256 constant META_ITEM_SIZE = 4;
 /// collision resistance only improves, so this is still safe.
 uint256 constant FINGERPRINT_MASK = 0xFFFFFF;
 
+/// @dev 33 = 32 bytes for expansion + 1 byte for seed
+uint256 constant META_EXPANSION_SIZE = 0x21;
+
 library LibParseMeta {
     function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256 bitmap, uint256 hashed) {
         assembly ("memory-safe") {
