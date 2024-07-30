@@ -19,7 +19,7 @@ contract LibBytecodeSourcePointerTest is BytecodeTest {
     /// bytes.
     function testSourcePointerEmpty0(uint256 sourceIndex) external {
         bytes memory bytecode = hex"";
-        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
+        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, bytecode));
         this.sourcePointerExternal(bytecode, sourceIndex);
     }
 
@@ -27,7 +27,7 @@ contract LibBytecodeSourcePointerTest is BytecodeTest {
     /// non-empty bytes but with no source.
     function testSourcePointerEmpty1(uint256 sourceIndex) external {
         bytes memory bytecode = hex"00";
-        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
+        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, bytecode));
         this.sourcePointerExternal(bytecode, sourceIndex);
     }
 
@@ -41,7 +41,7 @@ contract LibBytecodeSourcePointerTest is BytecodeTest {
         conformBytecode(bytecode, sourceCount, seed);
         sourceCount = LibBytecode.sourceCount(bytecode);
         sourceIndex = bound(sourceIndex, sourceCount, type(uint256).max);
-        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
+        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, bytecode));
         this.sourcePointerExternal(bytecode, sourceIndex);
     }
 

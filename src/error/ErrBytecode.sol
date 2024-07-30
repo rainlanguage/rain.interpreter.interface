@@ -5,9 +5,9 @@ pragma solidity ^0.8.25;
 contract ErrBytecode {}
 
 /// Thrown when a bytecode source index is out of bounds.
-/// @param bytecode The bytecode that was inspected.
 /// @param sourceIndex The source index that was out of bounds.
-error SourceIndexOutOfBounds(bytes bytecode, uint256 sourceIndex);
+/// @param bytecode The bytecode that was inspected.
+error SourceIndexOutOfBounds(uint256 sourceIndex, bytes bytecode);
 
 /// Thrown when a bytecode reports itself as 0 sources but has more than 1 byte.
 /// @param bytecode The bytecode that was inspected.

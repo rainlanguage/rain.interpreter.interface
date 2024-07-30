@@ -25,7 +25,7 @@ contract LibBytecodeSourceStackAllocationTest is BytecodeTest {
         conformBytecode(bytecode, sourceCount, seed);
         sourceCount = LibBytecode.sourceCount(bytecode);
         sourceIndex = bound(sourceIndex, sourceCount, type(uint256).max);
-        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
+        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, bytecode));
         this.sourceStackAllocationExternal(bytecode, sourceIndex);
     }
 

@@ -186,7 +186,7 @@ library LibBytecode {
     function sourceRelativeOffset(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 offset) {
         // If the source index requested is out of bounds, revert.
         if (sourceIndex >= sourceCount(bytecode)) {
-            revert SourceIndexOutOfBounds(bytecode, sourceIndex);
+            revert SourceIndexOutOfBounds(sourceIndex, bytecode);
         }
         assembly ("memory-safe") {
             // After the first byte, all the relative offset pointers are
