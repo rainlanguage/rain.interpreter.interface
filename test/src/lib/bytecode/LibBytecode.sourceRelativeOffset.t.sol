@@ -27,7 +27,7 @@ contract LibBytecodeSourceRelativeOffsetTest is BytecodeTest {
     }
 
     function checkSourceRelativeOffsetIndexOutOfBounds(bytes memory bytecode, uint256 sourceIndex) internal {
-        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
+        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, bytecode));
         this.sourceRelativeOffsetExternal(bytecode, sourceIndex);
     }
 

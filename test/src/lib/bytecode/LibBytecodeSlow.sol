@@ -20,7 +20,7 @@ library LibBytecodeSlow {
     function sourceRelativeOffsetSlow(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256) {
         uint256 sourceCount = sourceCountSlow(bytecode);
         if (sourceIndex >= sourceCount) {
-            revert SourceIndexOutOfBounds(bytecode, sourceIndex);
+            revert SourceIndexOutOfBounds(sourceIndex, bytecode);
         } else {
             uint256 offsetPosition = 1 + sourceIndex * 2;
             return uint256(uint8(bytecode[offsetPosition])) << 8 | uint256(uint8(bytecode[offsetPosition + 1]));
