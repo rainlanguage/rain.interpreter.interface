@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import "rain.lib.hash/LibHashNoAlloc.sol";
-import "rain.lib.typecast/LibCast.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
+import {LibHashNoAlloc, HASH_NIL} from "rain.lib.hash/LibHashNoAlloc.sol";
+import {LibCast} from "rain.lib.typecast/LibCast.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import "src/interface/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV3.sol";
 
 library LibContextSlow {
     using LibUint256Array for uint256;

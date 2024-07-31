@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {StateNamespace, FullyQualifiedNamespace} from "src/interface/IInterpreterV2.sol";
+import {StateNamespace, FullyQualifiedNamespace} from "src/interface/IInterpreterV3.sol";
 
 library LibNamespaceSlow {
     /// Implements an abi encoding based version of `qualifyNamespace` that is

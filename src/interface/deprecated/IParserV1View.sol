@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {AuthoringMeta, AuthoringMetaV2} from "../IParserV1.sol";
+import {AuthoringMeta, AuthoringMetaV2} from "./IParserV1.sol";
 
 /// @title IParserV1View
 /// Identical to `IParserV1` except the interface is `view` instead of `pure`.

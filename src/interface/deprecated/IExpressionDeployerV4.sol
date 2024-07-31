@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IInterpreterStoreV2} from "./IInterpreterStoreV2.sol";
+import {IInterpreterStoreV2} from "../IInterpreterStoreV2.sol";
 import {IInterpreterV2} from "./IInterpreterV2.sol";
 
-string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V3 = "IExpressionDeployerV3";
+string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V4 = "IExpressionDeployerV4";
 
-/// @title IExpressionDeployerV3
+/// @title IExpressionDeployerV4
 /// @notice Companion to `IInterpreterV2` responsible for onchain static code
-/// analysis and deploying expressions. Each `IExpressionDeployerV3` is tightly
+/// analysis and deploying expressions. Each `IExpressionDeployerV4` is tightly
 /// coupled at the bytecode level to some interpreter that it knows how to
 /// analyse and deploy expressions for. The expression deployer can perform an
 /// integrity check "dry run" of candidate source code for the intepreter. The
@@ -33,46 +33,40 @@ string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V3 = "IExpressionDeployerV3";
 /// responsibility to do everything it can to prevent undefined behaviour in the
 /// interpreter, and the interpreter's responsibility to handle the expression
 /// deployer completely failing to do so.
-interface IExpressionDeployerV3 {
+interface IExpressionDeployerV4 {
     /// The config of the deployed expression including uncompiled sources. MUST
     /// be emitted after the config passes the integrity check.
     /// @param sender The caller of `deployExpression2`.
-    /// @param bytecode As per `IExpressionDeployerV3.deployExpression2` inputs.
-    /// @param constants As per `IExpressionDeployerV3.deployExpression2` inputs.
+    /// @param bytecode As per `IExpressionDeployerV4.deployExpression2` inputs.
+    /// @param constants As per `IExpressionDeployerV4.deployExpression2` inputs.
     event NewExpression(address sender, bytes bytecode, uint256[] constants);
 
     /// The address of the deployed expression. MUST be emitted once the
     /// expression can be loaded and deserialized into an evaluable interpreter
     /// state.
     /// @param sender The caller of `deployExpression2`.
-    /// @param interpreter As per `IExpressionDeployerV3.deployExpression2` return.
-    /// @param store As per `IExpressionDeployerV3.deployExpression2` return.
-    /// @param expression As per `IExpressionDeployerV3.deployExpression2` return.
-    /// @param io As per `IExpressionDeployerV3.deployExpression2` return.
+    /// @param interpreter As per `IExpressionDeployerV4.deployExpression2` return.
+    /// @param store As per `IExpressionDeployerV4.deployExpression2` return.
+    /// @param expression As per `IExpressionDeployerV4.deployExpression2` return.
+    /// @param io As per `IExpressionDeployerV4.deployExpression2` return.
     event DeployedExpression(
         address sender, IInterpreterV2 interpreter, IInterpreterStoreV2 store, address expression, bytes io
     );
 
-    /// This is the literal InterpreterOpMeta bytes to be used offchain to make
-    /// sense of the opcodes in this interpreter deployment, as a human. For
-    /// formats like json that make heavy use of boilerplate, repetition and
-    /// whitespace, some kind of compression is recommended.
     /// The DISPair is a pairing of:
     /// - Deployer (this contract)
     /// - Interpreter
     /// - Store
     /// - Parser
     ///
-    /// @param sender The `msg.sender` providing the op meta.
+    /// @param sender The `msg.sender` deploying the DISPair.
     /// @param interpreter The interpreter the deployer believes it is qualified
     /// to perform integrity checks on behalf of.
     /// @param store The interpreter store the deployer believes is compatible
     /// with the interpreter.
     /// @param parser The parser the deployer believes is compatible with the
     /// interpreter.
-    /// @param meta The raw binary data of the construction meta. Maybe
-    /// compressed data etc. and is intended for offchain consumption.
-    event DISPair(address sender, address interpreter, address store, address parser, bytes meta);
+    event DISPairV2(address sender, address interpreter, address store, address parser);
 
     /// Expressions are expected to be deployed onchain as immutable contract
     /// code with a first class address like any other contract or account.
@@ -99,13 +93,13 @@ interface IExpressionDeployerV3 {
     /// total, and that no out of bounds memory reads/writes occur within this
     /// stack. A simple example of an invalid source would be one that pushes one
     /// value to the stack then attempts to pops two values, clearly we cannot
-    /// remove more values than we added. The `IExpressionDeployerV3` MUST revert
+    /// remove more values than we added. The `IExpressionDeployerV4` MUST revert
     /// in the case of any integrity failure, all integrity checks MUST pass in
     /// order for the deployment to complete.
     ///
-    /// Once the integrity check is complete the `IExpressionDeployerV3` MUST do
+    /// Once the integrity check is complete the `IExpressionDeployerV4` MUST do
     /// any additional processing required by its paired interpreter.
-    /// For example, the `IExpressionDeployerV3` MAY NEED to replace the indexed
+    /// For example, the `IExpressionDeployerV4` MAY NEED to replace the indexed
     /// opcodes in the `ExpressionConfig` sources with real function pointers
     /// from the corresponding interpreter.
     ///

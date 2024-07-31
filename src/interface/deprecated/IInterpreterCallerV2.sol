@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IExpressionDeployerV3} from "./IExpressionDeployerV3.sol";
-import {IInterpreterStoreV2} from "./IInterpreterStoreV2.sol";
+import {IInterpreterStoreV2} from "../IInterpreterStoreV2.sol";
 import {IInterpreterV2} from "./IInterpreterV2.sol";
 
 /// Standard struct that can be embedded in ABIs in a consistent format for

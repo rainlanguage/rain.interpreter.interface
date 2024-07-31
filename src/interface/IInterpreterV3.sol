@@ -7,7 +7,7 @@ import {
     StateNamespace,
     SourceIndexV2,
     DEFAULT_STATE_NAMESPACE
-} from "../IInterpreterV2.sol";
+} from "./deprecated/IInterpreterV2.sol";
 
 interface IInterpreterV3 {
     function functionPointers() external view returns (bytes calldata);

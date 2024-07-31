@@ -2,9 +2,9 @@
 pragma solidity ^0.8.18;
 
 // Reexports for implementations to use.
-import {AuthoringMetaV2} from "../IParserV1.sol";
-import {Operand} from "../IInterpreterV2.sol";
-import {COMPATIBILITY_V2, COMPATIBILITY_V3, COMPATIBILITY_V4} from "../ISubParserV2.sol";
+import {AuthoringMetaV2} from "./deprecated/IParserV1.sol";
+import {Operand} from "./deprecated/IInterpreterV2.sol";
+import {COMPATIBILITY_V2, COMPATIBILITY_V3, COMPATIBILITY_V4} from "./deprecated/ISubParserV2.sol";
 
 /// @title ISubParserV3
 /// Identical to `ISubParserV2` except the interface is `view` instead of `pure`.
