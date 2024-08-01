@@ -2,12 +2,11 @@
 pragma solidity ^0.8.18;
 
 /// Export dispair interfaces for convenience downstream.
-import {IExpressionDeployerV3} from "../../interface/IExpressionDeployerV3.sol";
 import {IInterpreterStoreV2} from "../../interface/IInterpreterStoreV2.sol";
-import {IInterpreterV2} from "../../interface/IInterpreterV2.sol";
-import {EvaluableV2} from "../../interface/IInterpreterCallerV2.sol";
+import {IInterpreterV2} from "../../interface/deprecated/IInterpreterV2.sol";
+import {EvaluableV2} from "../../interface/deprecated/IInterpreterCallerV2.sol";
 
-import {EvaluableV3} from "../../interface/unstable/IInterpreterCallerV3.sol";
+import {EvaluableV3} from "../../interface/IInterpreterCallerV3.sol";
 
 /// @title LibEvaluable
 /// @notice Common logic to provide consistent implementations of common tasks

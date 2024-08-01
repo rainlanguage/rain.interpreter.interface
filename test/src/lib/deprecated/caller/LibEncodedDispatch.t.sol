@@ -2,8 +2,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
-import {SourceIndexV2} from "src/interface/IInterpreterV2.sol";
+import {LibEncodedDispatch} from "src/lib/deprecated/caller/LibEncodedDispatch.sol";
+import {SourceIndexV2} from "src/interface/IInterpreterV3.sol";
 
 contract LibEncodedDispatchTest is Test {
     function testRoundTrip(address expression, SourceIndexV2 sourceIndex, uint16 maxOutputs) public {

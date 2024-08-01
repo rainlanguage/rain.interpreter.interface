@@ -2,14 +2,14 @@
 pragma solidity ^0.8.18;
 
 import {IParserV2} from "./IParserV2.sol";
-import {IInterpreterStoreV2} from "../IInterpreterStoreV2.sol";
+import {IInterpreterStoreV2} from "./IInterpreterStoreV2.sol";
 import {IInterpreterV3} from "./IInterpreterV3.sol";
 import {
     SignedContextV1,
     SIGNED_CONTEXT_SIGNER_OFFSET,
     SIGNED_CONTEXT_CONTEXT_OFFSET,
     SIGNED_CONTEXT_SIGNATURE_OFFSET
-} from "../IInterpreterCallerV2.sol";
+} from "./deprecated/IInterpreterCallerV2.sol";
 
 /// Struct over the return of `IParserV2.parse2` which MAY be more convenient to
 /// work with than raw addresses.
