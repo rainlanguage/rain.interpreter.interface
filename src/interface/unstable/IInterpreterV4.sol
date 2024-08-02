@@ -11,7 +11,8 @@ import {
     OPCODE_CONSTANT,
     OPCODE_CONTEXT,
     OPCODE_EXTERN,
-    OPCODE_UNKNOWN
+    OPCODE_UNKNOWN,
+    OPCODE_STACK
 } from "../IInterpreterV3.sol";
 
 /// @title IInterpreterV4
