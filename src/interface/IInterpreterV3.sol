@@ -8,7 +8,8 @@ import {
     SourceIndexV2,
     DEFAULT_STATE_NAMESPACE,
     Operand,
-    OPCODE_CONSTANT
+    OPCODE_CONSTANT,
+    OPCODE_CONTEXT
 } from "./deprecated/IInterpreterV2.sol";
 
 interface IInterpreterV3 {
