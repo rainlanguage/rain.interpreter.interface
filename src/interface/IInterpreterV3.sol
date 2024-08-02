@@ -6,7 +6,8 @@ import {
     FullyQualifiedNamespace,
     StateNamespace,
     SourceIndexV2,
-    DEFAULT_STATE_NAMESPACE
+    DEFAULT_STATE_NAMESPACE,
+    Operand
 } from "./deprecated/IInterpreterV2.sol";
 
 interface IInterpreterV3 {
