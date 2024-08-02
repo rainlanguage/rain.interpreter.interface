@@ -15,6 +15,16 @@ import {
     OPCODE_STACK
 } from "../IInterpreterV3.sol";
 
+struct EvalV4 {
+    IInterpreterStoreV2 store;
+    FullyQualifiedNamespace namespace;
+    bytes bytecode;
+    SourceIndexV2 sourceIndex;
+    uint256[][] context;
+    uint256[] inputs;
+    uint256[] stateOverlay;
+}
+
 /// @title IInterpreterV4
 /// Interface into a standard interpreter that supports:
 ///
@@ -62,13 +72,5 @@ interface IInterpreterV4 {
     ///   of state in the overlay will override corresponding gets from the store
     ///   unless/until they are set to something else in the evaluated logic.
     /// - Numbers are treated as Rain decimal floats, NOT fixed point decimals.
-    function eval4(
-        IInterpreterStoreV2 store,
-        FullyQualifiedNamespace namespace,
-        bytes calldata bytecode,
-        SourceIndexV2 sourceIndex,
-        uint256[][] calldata context,
-        uint256[] calldata inputs,
-        uint256[] calldata stateOverlay
-    ) external view returns (uint256[] calldata stack, uint256[] calldata writes);
+    function eval4(EvalV4 calldata eval) external view returns (uint256[] calldata stack, uint256[] calldata writes);
 }
