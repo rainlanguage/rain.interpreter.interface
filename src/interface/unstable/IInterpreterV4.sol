@@ -8,7 +8,8 @@ import {
     SourceIndexV2,
     DEFAULT_STATE_NAMESPACE,
     Operand,
-    OPCODE_CONSTANT
+    OPCODE_CONSTANT,
+    OPCODE_CONTEXT
 } from "../IInterpreterV3.sol";
 
 /// @title IInterpreterV4
