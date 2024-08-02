@@ -9,7 +9,8 @@ import {
     DEFAULT_STATE_NAMESPACE,
     Operand,
     OPCODE_CONSTANT,
-    OPCODE_CONTEXT
+    OPCODE_CONTEXT,
+    OPCODE_EXTERN
 } from "../IInterpreterV3.sol";
 
 /// @title IInterpreterV4

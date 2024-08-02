@@ -9,7 +9,8 @@ import {
     DEFAULT_STATE_NAMESPACE,
     Operand,
     OPCODE_CONSTANT,
-    OPCODE_CONTEXT
+    OPCODE_CONTEXT,
+    OPCODE_EXTERN
 } from "./deprecated/IInterpreterV2.sol";
 
 interface IInterpreterV3 {
