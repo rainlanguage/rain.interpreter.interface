@@ -10,7 +10,8 @@ import {
     Operand,
     OPCODE_CONSTANT,
     OPCODE_CONTEXT,
-    OPCODE_EXTERN
+    OPCODE_EXTERN,
+    OPCODE_UNKNOWN
 } from "./deprecated/IInterpreterV2.sol";
 
 interface IInterpreterV3 {
