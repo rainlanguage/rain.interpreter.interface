@@ -7,7 +7,7 @@ import {LibNamespace, StateNamespace, FullyQualifiedNamespace} from "src/lib/ns/
 import {LibNamespaceSlow} from "test/src/lib/ns/LibNamespaceSlow.sol";
 
 contract LibNamespaceTest is Test {
-    function testQualifyNamespaceReferenceImplementation(StateNamespace stateNamespace, address sender) public {
+    function testQualifyNamespaceReferenceImplementation(StateNamespace stateNamespace, address sender) public pure {
         assertEq(
             FullyQualifiedNamespace.unwrap(LibNamespace.qualifyNamespace(stateNamespace, sender)),
             FullyQualifiedNamespace.unwrap(LibNamespaceSlow.qualifyNamespaceSlow(stateNamespace, sender))

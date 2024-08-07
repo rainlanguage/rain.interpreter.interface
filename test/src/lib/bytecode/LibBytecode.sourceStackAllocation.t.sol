@@ -35,7 +35,7 @@ contract LibBytecodeSourceStackAllocationTest is BytecodeTest {
         uint256 sourceCount,
         uint256 sourceIndex,
         bytes32 seed
-    ) external {
+    ) external pure {
         conformBytecode(bytecode, sourceCount, seed);
         sourceCount = LibBytecode.sourceCount(bytecode);
         vm.assume(sourceCount > 0);

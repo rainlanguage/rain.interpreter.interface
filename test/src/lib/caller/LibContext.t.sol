@@ -6,7 +6,7 @@ import "src/lib/caller/LibContext.sol";
 import "./LibContextSlow.sol";
 
 contract LibContextTest is Test {
-    function testBase() public {
+    function testBase() public view {
         uint256[] memory baseContext = LibContext.base();
 
         assertEq(baseContext.length, 2);
@@ -15,7 +15,7 @@ contract LibContextTest is Test {
         assertTrue(msg.sender != address(this));
     }
 
-    function testBuildStructureReferenceImplementation(uint256[][] memory base) public {
+    function testBuildStructureReferenceImplementation(uint256[][] memory base) public view {
         // @todo support signed context testing, currently fails due to invalid
         // signatures blocking the build process.
         SignedContextV1[] memory signedContexts = new SignedContextV1[](0);
@@ -29,7 +29,7 @@ contract LibContextTest is Test {
         }
     }
 
-    function testBuild0() public {
+    function testBuild0() public view {
         // @todo test this better.
         uint256[][] memory expected = new uint256[][](1);
         expected[0] = LibContext.base();

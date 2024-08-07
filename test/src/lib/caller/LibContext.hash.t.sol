@@ -29,11 +29,11 @@ contract LibContextHashTest is Test {
         }
     }
 
-    function testSignedContextHashReferenceImplementation(SignedContextV1 memory signedContext) public {
+    function testSignedContextHashReferenceImplementation(SignedContextV1 memory signedContext) public pure {
         assertEq(LibContext.hash(signedContext), LibContextSlow.hashSlow(signedContext));
     }
 
-    function testSignedContextArrayHashReferenceImplementation0() public {
+    function testSignedContextArrayHashReferenceImplementation0() public pure {
         SignedContextV1[] memory signedContexts = new SignedContextV1[](1);
         signedContexts[0] = SignedContextV1(address(0), new uint256[](0), "");
         assertEq(LibContext.hash(signedContexts), LibContextSlow.hashSlow(signedContexts));
@@ -56,7 +56,7 @@ contract LibContextHashTest is Test {
 
     /// This is very slow ~10-15s due to the fuzzer taking a long time to produce
     /// the input data for some reason.
-    function testSignedContextArrayHashReferenceImplementation(SignedContextV1[] memory signedContexts) public {
+    function testSignedContextArrayHashReferenceImplementation(SignedContextV1[] memory signedContexts) public pure {
         assertEq(LibContext.hash(signedContexts), LibContextSlow.hashSlow(signedContexts));
     }
 }

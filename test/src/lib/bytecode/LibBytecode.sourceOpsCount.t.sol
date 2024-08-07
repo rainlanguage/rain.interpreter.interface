@@ -10,7 +10,7 @@ contract LibBytecodeSourceOpsCountTest is BytecodeTest {
         return LibBytecode.sourceOpsCount(bytecode, sourceIndex);
     }
 
-    function testSourceOpsCount() external {
+    function testSourceOpsCount() external pure {
         // 1 source 0 offset 0 header
         assertEq(LibBytecode.sourceOpsCount(hex"01000000000000", 0), 0);
         // 1 source 0 offset some header (should be 1)
@@ -41,7 +41,7 @@ contract LibBytecodeSourceOpsCountTest is BytecodeTest {
         uint256 sourceCount,
         uint256 sourceIndex,
         bytes32 seed
-    ) external {
+    ) external pure {
         conformBytecode(bytecode, sourceCount, seed);
         sourceCount = LibBytecode.sourceCount(bytecode);
         vm.assume(sourceCount > 0);

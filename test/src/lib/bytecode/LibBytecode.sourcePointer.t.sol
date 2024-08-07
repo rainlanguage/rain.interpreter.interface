@@ -48,6 +48,7 @@ contract LibBytecodeSourcePointerTest is BytecodeTest {
     /// Test against a reference implementation.
     function testSourcePointerAgainstSlow(bytes memory bytecode, uint256 sourceCount, uint256 sourceIndex, bytes32 seed)
         external
+        pure
     {
         conformBytecode(bytecode, sourceCount, seed);
         sourceCount = LibBytecode.sourceCount(bytecode);
