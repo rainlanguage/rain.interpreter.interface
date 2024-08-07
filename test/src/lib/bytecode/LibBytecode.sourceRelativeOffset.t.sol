@@ -7,7 +7,7 @@ import {LibBytecodeSlow} from "test/src/lib/bytecode/LibBytecodeSlow.sol";
 
 contract LibBytecodeSourceRelativeOffsetTest is BytecodeTest {
     /// Test some examples of source relative offsets.
-    function testSourceRelativeOffsetHappy() external {
+    function testSourceRelativeOffsetHappy() external pure {
         // 1 source 0 offset 0 header
         assertEq(LibBytecode.sourceRelativeOffset(hex"01000000000000", 0), 0);
         // 1 source 0 offset some header
@@ -66,7 +66,7 @@ contract LibBytecodeSourceRelativeOffsetTest is BytecodeTest {
         uint256 sourceCount,
         uint256 sourceIndex,
         bytes32 seed
-    ) external {
+    ) external pure {
         conformBytecode(bytecode, sourceCount, seed);
         sourceCount = LibBytecode.sourceCount(bytecode);
         vm.assume(sourceCount > 0);

@@ -11,7 +11,7 @@ contract LitParseMetaTest is Test {
         bitmap = 1 << uint256(uint8(uint256(hashed) >> 0xF8));
     }
 
-    function testWordBitmapped(uint256 seed, bytes32 word) public {
+    function testWordBitmapped(uint256 seed, bytes32 word) public pure {
         (uint256 bitmap, uint256 hashed) = LibParseMeta.wordBitmapped(seed, word);
         (uint256 refBitmap, uint256 refHashed) = referenceWordBitmapped(seed, word);
         assertEq(bitmap, refBitmap, "bitmap");
