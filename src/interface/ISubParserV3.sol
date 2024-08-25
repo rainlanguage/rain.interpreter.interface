@@ -6,6 +6,18 @@ import {AuthoringMetaV2} from "./deprecated/IParserV1.sol";
 import {Operand} from "./deprecated/IInterpreterV2.sol";
 import {COMPATIBILITY_V2, COMPATIBILITY_V3, COMPATIBILITY_V4} from "./deprecated/ISubParserV2.sol";
 
+/// @dev A compatibility version for the subparser interface.
+///
+/// Identical to COMPATIBILITY_V4, except that instead of all decimal values
+/// being scaled to an 18 decimal fixed point, decimal values are now all
+/// packed floating point values as per the canonical Rain implementation.
+///
+/// This implies that only hex literals can represent binary integer values.
+///
+/// This also implies that negative numbers are valid, and values that are far
+/// out of range of fixed point representations.
+bytes32 constant COMPATIBILITY_V5 = keccak256("2024.08.25 Rainlang ISubParserV3");
+
 /// @title ISubParserV3
 /// Identical to `ISubParserV2` except the interface is `view` instead of `pure`.
 interface ISubParserV3 {
