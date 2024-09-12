@@ -29,6 +29,7 @@ contract LibContextHashTest is Test {
         }
     }
 
+    /// forge-config: default.fuzz.runs = 100
     function testSignedContextHashReferenceImplementation(SignedContextV1 memory signedContext) public pure {
         assertEq(LibContext.hash(signedContext), LibContextSlow.hashSlow(signedContext));
     }
@@ -54,8 +55,7 @@ contract LibContextHashTest is Test {
         keccak256(data);
     }
 
-    /// This is very slow ~10-15s due to the fuzzer taking a long time to produce
-    /// the input data for some reason.
+    /// forge-config: default.fuzz.runs = 100
     function testSignedContextArrayHashReferenceImplementation(SignedContextV1[] memory signedContexts) public pure {
         assertEq(LibContext.hash(signedContexts), LibContextSlow.hashSlow(signedContexts));
     }
