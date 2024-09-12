@@ -15,6 +15,7 @@ contract LibContextTest is Test {
         assertTrue(msg.sender != address(this));
     }
 
+    /// forge-config: default.fuzz.runs = 100
     function testBuildStructureReferenceImplementation(uint256[][] memory base) public view {
         // @todo support signed context testing, currently fails due to invalid
         // signatures blocking the build process.
