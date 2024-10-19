@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LicenseRef-DCL-1.0
 // SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.25;
 
 /// Export dispair interfaces for convenience downstream.
 import {IInterpreterStoreV2} from "../../interface/IInterpreterStoreV2.sol";
