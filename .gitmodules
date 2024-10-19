@@ -4,9 +4,6 @@
 [submodule "lib/rain.lib.typecast"]
 	path = lib/rain.lib.typecast
 	url = https://github.com/rainlanguage/rain.lib.typecast
-[submodule "lib/rain.lib.hash"]
-	path = lib/rain.lib.hash
-	url = https://github.com/rainlanguage/rain.lib.hash
 [submodule "lib/rain.math.binary"]
 	path = lib/rain.math.binary
 	url = https://github.com/rainlanguage/rain.math.binary
@@ -19,3 +16,6 @@
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "lib/rain.lib.hash"]
+	path = lib/rain.lib.hash
+	url = https://github.com/rainlanguage/rain.lib.hash
