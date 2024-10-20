@@ -2,6 +2,10 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity ^0.8.25;
 
+import {Operand} from "../../interface/IInterpreterV3.sol";
+import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
+import {UnexpectedOperand, UnexpectedOperandValue, ExpectedOperand} from "../../error/ErrParse.sol";
+
 library LibHandleOperand {
     function handleOperandDisallowed(uint256[] memory values) internal pure returns (Operand) {
         if (values.length != 0) {

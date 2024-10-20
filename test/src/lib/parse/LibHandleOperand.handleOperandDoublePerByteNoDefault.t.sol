@@ -2,17 +2,16 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
+import {LibHandleOperand, Operand} from "src/lib/parse/LibHandleOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
-contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
+contract LibHandleOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     // There must be exactly two values so zero values is an error.
     function testHandleOperandDoublePerByteNoDefaultNoValues() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(new uint256[](0));
+        LibHandleOperand.handleOperandDoublePerByteNoDefault(new uint256[](0));
     }
 
     // There must be exactly two values so one value is an error.
@@ -21,14 +20,14 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         uint256[] memory values = new uint256[](1);
         values[0] = value;
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+        LibHandleOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
     // There must be exactly two values so three or more values is an error.
     function testHandleOperandDoublePerByteNoDefaultManyValues(uint256[] memory values) external {
         vm.assume(values.length > 2);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+        LibHandleOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
     // If the first value is greater than 1 byte, it is an error.
@@ -51,7 +50,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
                 IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(a, DECIMAL_MAX_SAFE_INT), 255
             )
         );
-        LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+        LibHandleOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
     // If the second value is greater than 1 byte, it is an error.
@@ -73,7 +72,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
                 IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(b, DECIMAL_MAX_SAFE_INT), 255
             )
         );
-        LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+        LibHandleOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
     // If both values are within 1 byte, it is not an error, the result is the
@@ -85,6 +84,6 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
-        assertEq(Operand.unwrap(LibParseOperand.handleOperandDoublePerByteNoDefault(values)), (b << 8) | a);
+        assertEq(Operand.unwrap(LibHandleOperand.handleOperandDoublePerByteNoDefault(values)), (b << 8) | a);
     }
 }
