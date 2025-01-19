@@ -8,13 +8,14 @@ import {
     StateNamespace,
     SourceIndexV2,
     DEFAULT_STATE_NAMESPACE,
-    Operand,
     OPCODE_CONSTANT,
     OPCODE_CONTEXT,
     OPCODE_EXTERN,
     OPCODE_UNKNOWN,
     OPCODE_STACK
 } from "../IInterpreterV3.sol";
+
+type OperandV2 is bytes32;
 
 struct EvalV4 {
     IInterpreterStoreV2 store;
