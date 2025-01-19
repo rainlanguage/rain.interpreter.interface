@@ -21,20 +21,20 @@ struct EvalV4 {
     FullyQualifiedNamespace namespace;
     bytes bytecode;
     SourceIndexV2 sourceIndex;
-    uint256[][] context;
-    uint256[] inputs;
-    uint256[] stateOverlay;
+    bytes32[][] context;
+    bytes32[] inputs;
+    bytes32[] stateOverlay;
 }
 
 /// @title IInterpreterV4
 /// Interface into a standard interpreter that supports:
 ///
 /// - evaluating Rainlang logic provided as rain bytecode in calldata
-/// - receiving arbitrary `uint256[][]` supporting context to be made available
-///   to the evaluated logic
-/// - receiving arbitrary `uint256[]` inputs to be made available to the
-///   evaluated logic
-/// - receiving arbitrary `uint256[]` stateOverlay to be applied to the
+/// - receiving arbitrary `bytes32[][]` supporting context to be made available
+///   to the evaluated logic via. context aware opcodes
+/// - receiving arbitrary `bytes32[]` inputs to be made available to the
+///   evaluated logic as prepoluated stack items
+/// - receiving arbitrary `bytes32[]` stateOverlay to be applied to the
 ///   state before evaluation to facilitate "what if" analysis
 /// - handling subsequent state changes in bulk in response to evaluated logic
 /// - namespacing state changes according to the caller's preferences to avoid
@@ -72,6 +72,7 @@ interface IInterpreterV4 {
     /// - Supports state overlays to facilitate "what if" analysis. Each item
     ///   of state in the overlay will override corresponding gets from the store
     ///   unless/until they are set to something else in the evaluated logic.
-    /// - Numbers are treated as Rain decimal floats, NOT fixed point decimals.
-    function eval4(EvalV4 calldata eval) external view returns (uint256[] calldata stack, uint256[] calldata writes);
+    /// - Numbers are treated as packed Rain decimal floats, NOT fixed point
+    ///   decimals.
+    function eval4(EvalV4 calldata eval) external view returns (bytes32[] calldata stack, bytes32[] calldata writes);
 }
