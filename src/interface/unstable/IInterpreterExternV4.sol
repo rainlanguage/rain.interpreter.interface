@@ -5,6 +5,7 @@ pragma solidity ^0.8.18;
 import {StackItem} from "./IInterpreterV4.sol";
 
 type EncodedExternDispatchV2 is bytes32;
+
 type ExternDispatchV2 is bytes32;
 
 /// @title IInterpreterExternV4

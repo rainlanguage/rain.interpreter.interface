@@ -16,6 +16,7 @@ import {
 } from "../IInterpreterV3.sol";
 
 type OperandV2 is bytes32;
+
 type StackItem is bytes32;
 
 struct EvalV4 {
@@ -76,5 +77,8 @@ interface IInterpreterV4 {
     ///   unless/until they are set to something else in the evaluated logic.
     /// - Numbers are treated as packed Rain decimal floats, NOT fixed point
     ///   decimals.
-    function eval4(EvalV4 calldata eval) external view returns (StackItem[] calldata stack, bytes32[] calldata writes);
+    function eval4(EvalV4 calldata eval)
+        external
+        view
+        returns (StackItem[] calldata stack, bytes32[] calldata writes);
 }
