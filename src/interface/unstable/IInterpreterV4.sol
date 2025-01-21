@@ -17,13 +17,15 @@ import {
 
 type OperandV2 is bytes32;
 
+type StackItem is bytes32;
+
 struct EvalV4 {
     IInterpreterStoreV2 store;
     FullyQualifiedNamespace namespace;
     bytes bytecode;
     SourceIndexV2 sourceIndex;
     bytes32[][] context;
-    bytes32[] inputs;
+    StackItem[] inputs;
     bytes32[] stateOverlay;
 }
 
@@ -75,5 +77,8 @@ interface IInterpreterV4 {
     ///   unless/until they are set to something else in the evaluated logic.
     /// - Numbers are treated as packed Rain decimal floats, NOT fixed point
     ///   decimals.
-    function eval4(EvalV4 calldata eval) external view returns (bytes32[] calldata stack, bytes32[] calldata writes);
+    function eval4(EvalV4 calldata eval)
+        external
+        view
+        returns (StackItem[] calldata stack, bytes32[] calldata writes);
 }
