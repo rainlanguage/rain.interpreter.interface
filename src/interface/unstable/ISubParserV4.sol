@@ -3,7 +3,7 @@
 pragma solidity ^0.8.18;
 
 // Reexports for implementations to use.
-// import {AuthoringMetaV2} from "./deprecated/IParserV1.sol";
+import {AuthoringMetaV2} from "../ISubParserV3.sol";
 import {OperandV2} from "./IInterpreterV4.sol";
 
 /// @title ISubParserV4
