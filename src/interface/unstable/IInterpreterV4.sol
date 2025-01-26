@@ -3,7 +3,6 @@
 pragma solidity ^0.8.25;
 
 import {
-    IInterpreterStoreV2,
     FullyQualifiedNamespace,
     StateNamespace,
     SourceIndexV2,
@@ -14,13 +13,14 @@ import {
     OPCODE_UNKNOWN,
     OPCODE_STACK
 } from "../IInterpreterV3.sol";
+import {IInterpreterStoreV3} from "./IInterpreterStoreV3.sol";
 
 type OperandV2 is bytes32;
 
 type StackItem is bytes32;
 
 struct EvalV4 {
-    IInterpreterStoreV2 store;
+    IInterpreterStoreV3 store;
     FullyQualifiedNamespace namespace;
     bytes bytecode;
     SourceIndexV2 sourceIndex;
