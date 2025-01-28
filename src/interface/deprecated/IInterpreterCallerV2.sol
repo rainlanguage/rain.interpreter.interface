@@ -63,7 +63,7 @@ struct SignedContextV1 {
     // The ordering of these fields is important and used in assembly offset
     // calculations and hashing.
     address signer;
-    uint256[] context;
+    bytes32[] context;
     bytes signature;
 }
 
