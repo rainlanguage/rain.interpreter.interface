@@ -199,7 +199,7 @@ library LibContext {
                         revert InvalidSignature(i);
                     }
 
-                    signers[i] = bytes32(bytes20(signedContexts[i].signer));
+                    signers[i] = bytes32(uint256(uint160(signedContexts[i].signer)));
                     offset++;
                     context[offset] = signedContexts[i].context;
                 }
