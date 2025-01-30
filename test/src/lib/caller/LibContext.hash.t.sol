@@ -9,9 +9,9 @@ import "./LibContextSlow.sol";
 contract LibContextHashTest is Test {
     function testFuzzHash0() public pure {
         SignedContextV1[] memory signedContexts = new SignedContextV1[](3);
-        signedContexts[0] = SignedContextV1(address(0), new uint256[](5), new bytes(65));
-        signedContexts[1] = SignedContextV1(address(0), new uint256[](5), new bytes(65));
-        signedContexts[2] = SignedContextV1(address(0), new uint256[](5), new bytes(65));
+        signedContexts[0] = SignedContextV1(address(0), new bytes32[](5), new bytes(65));
+        signedContexts[1] = SignedContextV1(address(0), new bytes32[](5), new bytes(65));
+        signedContexts[2] = SignedContextV1(address(0), new bytes32[](5), new bytes(65));
 
         LibContext.hash(signedContexts);
     }
@@ -37,12 +37,12 @@ contract LibContextHashTest is Test {
 
     function testSignedContextArrayHashReferenceImplementation0() public pure {
         SignedContextV1[] memory signedContexts = new SignedContextV1[](1);
-        signedContexts[0] = SignedContextV1(address(0), new uint256[](0), "");
+        signedContexts[0] = SignedContextV1(address(0), new bytes32[](0), "");
         assertEq(LibContext.hash(signedContexts), LibContextSlow.hashSlow(signedContexts));
     }
 
     function testSignedContextHashGas0() public pure {
-        SignedContextV1 memory context = SignedContextV1(address(0), new uint256[](5), new bytes(65));
+        SignedContextV1 memory context = SignedContextV1(address(0), new bytes32[](5), new bytes(65));
         LibContext.hash(context);
         // 1199 gas
         // bytes memory bytes = abi.encode(context);
@@ -50,7 +50,7 @@ contract LibContextHashTest is Test {
     }
 
     function testSignedContextHashEncodeGas0() public pure {
-        SignedContextV1 memory context = SignedContextV1(address(0), new uint256[](5), new bytes(65));
+        SignedContextV1 memory context = SignedContextV1(address(0), new bytes32[](5), new bytes(65));
         // 1199 gas
         bytes memory data = abi.encode(context);
         keccak256(data);

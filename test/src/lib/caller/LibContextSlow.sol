@@ -14,7 +14,7 @@ library LibContextSlow {
 
     function hashSlow(SignedContextV1 memory signedContext) internal pure returns (bytes32) {
         bytes32 a = LibHashNoAlloc.hashWords(uint256(uint160(signedContext.signer)).arrayFrom().asBytes32Array());
-        bytes32 b = LibHashNoAlloc.hashWords(signedContext.context.asBytes32Array());
+        bytes32 b = LibHashNoAlloc.hashWords(signedContext.context);
         bytes32 c = LibHashNoAlloc.combineHashes(a, b);
         bytes32 d = LibHashNoAlloc.hashBytes(signedContext.signature);
         bytes32 e = LibHashNoAlloc.combineHashes(c, d);
@@ -31,15 +31,15 @@ library LibContextSlow {
         return hashed;
     }
 
-    function buildStructureSlow(uint256[][] memory baseContext, SignedContextV1[] memory signedContexts)
+    function buildStructureSlow(bytes32[][] memory baseContext, SignedContextV1[] memory signedContexts)
         internal
         view
-        returns (uint256[][] memory)
+        returns (bytes32[][] memory)
     {
-        uint256[][] memory context = new uint256[][](1 + baseContext.length + signedContexts.length);
-        context[0] = new uint256[](2);
-        context[0][0] = uint256(uint160(address(msg.sender)));
-        context[0][1] = uint256(uint160(address(this)));
+        bytes32[][] memory context = new bytes32[][](1 + baseContext.length + 1 + signedContexts.length);
+        context[0] = new bytes32[](2);
+        context[0][0] = bytes32(uint256(uint160(address(msg.sender))));
+        context[0][1] = bytes32(uint256(uint160(address(this))));
 
         uint256 offset = 1;
         uint256 i = 0;
@@ -47,6 +47,13 @@ library LibContextSlow {
             context[i + offset] = baseContext[i];
         }
         offset = offset + i;
+
+        bytes32[] memory signers = new bytes32[](signedContexts.length);
+        for (i = 0; i < signedContexts.length; i++) {
+            signers[i] = bytes32(uint256(uint160(signedContexts[i].signer)));
+        }
+        context[offset] = signers;
+        offset = offset + 1;
 
         i = 0;
         for (; i < signedContexts.length; i++) {

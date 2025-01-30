@@ -49,10 +49,16 @@ library LibContext {
     /// Calling contracts DO NOT need to call this directly. It is built and
     /// merged automatically into the standard context built by `build`.
     ///
-    /// @return The `msg.sender` and address of the calling contract using this
+    /// @return baseArray The `msg.sender` and address of the calling contract using this
     /// library, as a context-compatible array.
-    function base() internal view returns (uint256[] memory) {
-        return LibUint256Array.arrayFrom(uint256(uint160(msg.sender)), uint256(uint160(address(this))));
+    function base() internal view returns (bytes32[] memory baseArray) {
+        assembly ("memory-safe") {
+            baseArray := mload(0x40)
+            mstore(baseArray, 2)
+            mstore(add(baseArray, 0x20), caller())
+            mstore(add(baseArray, 0x40), address())
+            mstore(0x40, add(baseArray, 0x60))
+        }
     }
 
     /// Standard hashing process over a single `SignedContextV1`. Notably used
@@ -148,19 +154,19 @@ library LibContext {
     /// position that would force signed context to be provided in the "correct"
     /// order, rather than relying on the `msg.sender` to honestly present data
     /// in any particular structure/order.
-    function build(uint256[][] memory baseContext, SignedContextV1[] memory signedContexts)
+    function build(bytes32[][] memory baseContext, SignedContextV1[] memory signedContexts)
         internal
         view
-        returns (uint256[][] memory)
+        returns (bytes32[][] memory)
     {
         unchecked {
-            uint256[] memory signers = new uint256[](signedContexts.length);
+            bytes32[] memory signers = new bytes32[](signedContexts.length);
 
             // - LibContext.base() + whatever we are provided.
             // - signed contexts + signers if they exist else nothing.
             uint256 contextLength = 1 + baseContext.length + (signedContexts.length > 0 ? signedContexts.length + 1 : 0);
 
-            uint256[][] memory context = new uint256[][](contextLength);
+            bytes32[][] memory context = new bytes32[][](contextLength);
             uint256 offset = 0;
             context[offset] = LibContext.base();
 
@@ -193,7 +199,7 @@ library LibContext {
                         revert InvalidSignature(i);
                     }
 
-                    signers[i] = uint256(uint160(signedContexts[i].signer));
+                    signers[i] = bytes32(uint256(uint160(signedContexts[i].signer)));
                     offset++;
                     context[offset] = signedContexts[i].context;
                 }
