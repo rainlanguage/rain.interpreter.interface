@@ -38,8 +38,8 @@ library LibContextSlow {
     {
         bytes32[][] memory context = new bytes32[][](1 + baseContext.length + signedContexts.length);
         context[0] = new bytes32[](2);
-        context[0][0] = bytes32(bytes20(address(msg.sender)));
-        context[0][1] = bytes32(bytes20(address(this)));
+        context[0][0] = bytes32(uint256(uint160(address(msg.sender))));
+        context[0][1] = bytes32(uint256(uint160(address(this))));
 
         uint256 offset = 1;
         uint256 i = 0;
