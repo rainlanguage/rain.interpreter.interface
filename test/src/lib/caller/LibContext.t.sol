@@ -11,8 +11,8 @@ contract LibContextTest is Test {
         bytes32[] memory baseContext = LibContext.base();
 
         assertEq(baseContext.length, 2);
-        assertEq(baseContext[0], bytes32(bytes20(msg.sender)));
-        assertEq(baseContext[1], bytes32(bytes20(address(this))));
+        assertEq(baseContext[0], bytes32(uint256(uint160(msg.sender))));
+        assertEq(baseContext[1], bytes32(uint256(uint160(address(this)))));
         assertTrue(msg.sender != address(this));
     }
 
