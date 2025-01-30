@@ -37,16 +37,16 @@ library LibBytecodeSlow {
     /// source count is the top byte of the first word of the source header.
     function sourceOpsCountSlow(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256) {
         Pointer pointer = sourcePointerSlow(bytecode, sourceIndex);
-        uint256 word = pointer.unsafeReadWord();
-        return word >> 0xF8;
+        bytes32 word = pointer.unsafeReadWord();
+        return uint256(word >> 0xF8);
     }
 
     /// stack allocation is the second byte from the top of the first word of the
     /// source header.
     function sourceStackAllocationSlow(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256) {
         Pointer pointer = sourcePointerSlow(bytecode, sourceIndex);
-        uint256 word = pointer.unsafeReadWord();
-        return (word >> 0xF0) & 0xFF;
+        bytes32 word = pointer.unsafeReadWord();
+        return uint256((word >> 0xF0) & bytes32(uint256(0xFF)));
     }
 
     /// source inputs and outputs are the third and fourth bytes from the top of
@@ -57,8 +57,8 @@ library LibBytecodeSlow {
         returns (uint256 inputs, uint256 outputs)
     {
         Pointer pointer = sourcePointerSlow(bytecode, sourceIndex);
-        uint256 word = pointer.unsafeReadWord();
-        inputs = (word >> 0xE8) & 0xFF;
-        outputs = (word >> 0xE0) & 0xFF;
+        bytes32 word = pointer.unsafeReadWord();
+        inputs = uint256((word >> 0xE8) & bytes32(uint256(0xFF)));
+        outputs = uint256((word >> 0xE0) & bytes32(uint256(0xFF)));
     }
 }

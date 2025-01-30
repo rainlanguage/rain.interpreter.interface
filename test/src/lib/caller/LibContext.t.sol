@@ -26,8 +26,10 @@ contract LibContextTest is Test {
         // This was generated as a new wallet by cast.
         address signer = 0xc9A34471D83253B148C821886278ae22EbaB23E4;
         bytes32 signerPrivateKey = bytes32(0x61b952d0c26214380daf3ca0a8ec9316682d63673db12d723c30417c86dbfca2);
+        (signerPrivateKey);
 
         bytes32 toSign = ECDSA.toEthSignedMessageHash(LibHashNoAlloc.hashWords(unsignedContext));
+        (toSign);
 
         SignedContextV1[] memory signedContexts = new SignedContextV1[](1);
         signedContexts[0] = SignedContextV1({
