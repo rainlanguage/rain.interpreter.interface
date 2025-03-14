@@ -17,8 +17,6 @@ import {IInterpreterStoreV3} from "./IInterpreterStoreV3.sol";
 
 type OperandV2 is bytes32;
 
-type StackItem is bytes32;
-
 struct EvalV4 {
     IInterpreterStoreV3 store;
     FullyQualifiedNamespace namespace;
