@@ -3,7 +3,7 @@
 pragma solidity ^0.8.18;
 
 import {IParserV2} from "../IParserV2.sol";
-import {IInterpreterStoreV2} from "../IInterpreterStoreV2.sol";
+import {IInterpreterStoreV3} from "./IInterpreterStoreV3.sol";
 import {IInterpreterV4} from "./IInterpreterV4.sol";
 import {
     SignedContextV1,
@@ -17,7 +17,7 @@ import {
 /// @param expression Will be evaluated by the interpreter.
 struct EvaluableV4 {
     IInterpreterV4 interpreter;
-    IInterpreterStoreV2 store;
+    IInterpreterStoreV3 store;
     bytes bytecode;
 }
 
