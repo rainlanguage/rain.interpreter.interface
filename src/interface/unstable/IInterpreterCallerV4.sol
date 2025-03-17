@@ -37,5 +37,5 @@ interface IInterpreterCallerV4 {
     /// all share a common context, in which case a single emit is sufficient.
     /// @param sender `msg.sender` building the context.
     /// @param context The context that was built.
-    event Context(address sender, uint256[][] context);
+    event ContextV2(address sender, bytes32[][] context);
 }
