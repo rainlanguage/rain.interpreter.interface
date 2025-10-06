@@ -18,7 +18,7 @@
     "rev": "d4fea34509c8b2ed5411aff28233e4c52549b62d"
   },
   "lib/rain.math.float": {
-    "rev": "466937fc361938a153641e63c6e004ab344d9317"
+    "rev": "fd29feab96a5a96163c03b8f6896234e09de367a"
   },
   "lib/rain.sol.codegen": {
     "rev": "769792d577a7ecae954a7cdd64a222b8d6fe450d"
