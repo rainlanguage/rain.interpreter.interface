@@ -16,6 +16,9 @@ contract LibGenParseMetaBuildMetaTest is Test {
         // + 1 for solidity flooring everything
         // + 1 for a non-fully saturated but still quite full expander
         // + 1 for a potentially nearly empty expander
+        // This is NOT a safe typecast, but in normal useage we are unlikely to
+        // get anywhere near the limit as that would imply ~256^2 words.
+        //forge-lint: disable-next-line(unsafe-typecast)
         return uint8(n / type(uint8).max + 3);
     }
 

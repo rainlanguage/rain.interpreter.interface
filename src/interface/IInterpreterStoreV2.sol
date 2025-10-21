@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.18;
 
+// Exported for convenience.
+//forge-lint: disable-next-line(unused-import)
 import {StateNamespace, FullyQualifiedNamespace, NO_STORE} from "./deprecated/IInterpreterStoreV1.sol";
 
 /// @title IInterpreterStoreV2

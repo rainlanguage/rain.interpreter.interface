@@ -5,7 +5,6 @@ pragma solidity =0.8.25;
 import {BytecodeTest} from "test/abstract/BytecodeTest.sol";
 import {LibBytecode, SourceIndexOutOfBounds} from "src/lib/bytecode/LibBytecode.sol";
 import {LibBytecodeSlow} from "test/src/lib/bytecode/LibBytecodeSlow.sol";
-import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 contract LibBytecodeSourceInputsOutputsTest is BytecodeTest {
     function sourceInputsOutputsExternal(bytes memory bytecode, uint256 sourceIndex)

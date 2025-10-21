@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.18;
 
+// Exported for convenience.
+//forge-lint: disable-next-line(unused-import)
 import {AuthoringMeta, AuthoringMetaV2} from "./IParserV1.sol";
 
 /// @title IParserV1View

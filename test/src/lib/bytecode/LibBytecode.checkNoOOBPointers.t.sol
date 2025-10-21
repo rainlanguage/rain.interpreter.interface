@@ -22,6 +22,7 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
 
     /// Expose the library function externally so we can expect reverts against
     /// it.
+    //forge-lint: disable-next-line(mixed-case-function)
     function checkNoOOBPointersExternal(bytes memory bytecode) external pure {
         LibBytecode.checkNoOOBPointers(bytecode);
     }
@@ -96,7 +97,11 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
         }
         corruptOffset = bound(corruptOffset, nextOffset - 3, type(uint16).max);
         uint256 offsetPosition = offsetIndex * 2 + 1;
+        // Taking the corrupt offset one byte at a time, so a shift and truncate
+        // is expected.
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[offsetPosition] = bytes1(uint8(corruptOffset >> 8));
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[offsetPosition + 1] = bytes1(uint8(corruptOffset));
 
         vm.expectRevert(abi.encodeWithSelector(TruncatedHeader.selector, bytecode));
@@ -166,7 +171,11 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
             uint256 offset = (uint256(uint8(bytecodeCorrupted[offsetPosition])) << 8)
                 | uint256(uint8(bytecodeCorrupted[offsetPosition + 1]));
             offset += garbage.length;
+            // Deliberately writing offset as two bytes so the truncation per
+            // byte is intentional.
+            //forge-lint: disable-next-line(unsafe-typecast)
             bytecodeCorrupted[offsetPosition] = bytes1(uint8(offset >> 8));
+            //forge-lint: disable-next-line(unsafe-typecast)
             bytecodeCorrupted[offsetPosition + 1] = bytes1(uint8(offset));
         }
 
@@ -302,12 +311,18 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
                 inputs = bound(corruptInputs, 1, type(uint8).max);
                 outputs = bound(corruptOutputs, 0, inputs - 1);
             }
+            // Inputs is either a single byte or bound so safe to cast like this.
+            //forge-lint: disable-next-line(unsafe-typecast)
             bytecode[inputsPosition] = bytes1(uint8(inputs));
+            // Outputs is a single byte or bound so safe to cast like this.
+            //forge-lint: disable-next-line(unsafe-typecast)
             bytecode[outputsPosition] = bytes1(uint8(outputs));
 
             // Ensure the allocation is valid so we don't get false positives.
             uint256 allocation = uint256(uint8(bytecode[headerPosition + 1]));
             allocation = bound(allocation, outputs, type(uint8).max);
+            // Allocation is bound so safe to cast.
+            //forge-lint: disable-next-line(unsafe-typecast)
             bytecode[headerPosition + 1] = bytes1(uint8(allocation));
         }
 
@@ -351,12 +366,21 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
                 outputs = bound(corruptOutputs, 1, type(uint8).max);
                 allocation = bound(corruptAllocation, 0, outputs - 1);
             }
+            // Outputs is either a single byte or bound above so it is safe to
+            // cast like this.
+            //forge-lint: disable-next-line(unsafe-typecast)
             bytecode[outputsPosition] = bytes1(uint8(outputs));
+            // Allocation is either a single byte or bound above so it is safe
+            // to cast like this.
+            //forge-lint: disable-next-line(unsafe-typecast)
             bytecode[allocationPosition] = bytes1(uint8(allocation));
 
             // Ensure the inputs is valid so we don't get false positives.
             uint256 inputs = uint256(uint8(bytecode[headerPosition + 2]));
             inputs = bound(inputs, 0, outputs);
+            // Outputs bound to type(uint8).max so this can't overflow due to
+            // the inputs bound.
+            //forge-lint: disable-next-line(unsafe-typecast)
             bytecode[headerPosition + 2] = bytes1(uint8(inputs));
         }
 
