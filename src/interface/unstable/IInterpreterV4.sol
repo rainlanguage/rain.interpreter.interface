@@ -4,13 +4,27 @@ pragma solidity ^0.8.25;
 
 import {
     FullyQualifiedNamespace,
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
     StateNamespace,
     SourceIndexV2,
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
     DEFAULT_STATE_NAMESPACE,
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
     OPCODE_CONSTANT,
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
     OPCODE_CONTEXT,
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
     OPCODE_EXTERN,
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
     OPCODE_UNKNOWN,
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
     OPCODE_STACK
 } from "../IInterpreterV3.sol";
 import {IInterpreterStoreV3} from "./IInterpreterStoreV3.sol";

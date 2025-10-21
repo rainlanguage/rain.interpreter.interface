@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import "forge-std/Test.sol";
-import "src/lib/caller/LibContext.sol";
-import "./LibContextSlow.sol";
+import {Test} from "forge-std/Test.sol";
+import {LibContext, ECDSA, LibHashNoAlloc, SignedContextV1} from "src/lib/caller/LibContext.sol";
+import {LibContextSlow} from "./LibContextSlow.sol";
 
 contract LibContextTest is Test {
     function testBase() public view {

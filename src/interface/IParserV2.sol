@@ -3,6 +3,7 @@
 pragma solidity ^0.8.18;
 
 // Reexport AuthoringMetaV2 for downstream use.
+//forge-lint: disable-next-line(unused-import)
 import {AuthoringMetaV2} from "./deprecated/IParserV1.sol";
 
 interface IParserV2 {

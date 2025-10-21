@@ -66,6 +66,7 @@ library LibBytecode {
     /// - The number of opcodes specified in the header of each source locates
     ///   the end of the source exactly at either the offset of the next source
     ///   or the end of the bytecode `bytes`.
+    //forge-lint: disable-next-line(mixed-case-function)
     function checkNoOOBPointers(bytes memory bytecode) internal pure {
         unchecked {
             uint256 count = sourceCount(bytecode);

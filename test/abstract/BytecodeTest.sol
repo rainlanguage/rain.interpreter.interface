@@ -27,6 +27,9 @@ abstract contract BytecodeTest is Test {
                     return;
                 }
 
+                // Sourcecount is bound to max source count which is bound so
+                // this typecast is safe.
+                //forge-lint: disable-next-line(unsafe-typecast)
                 bytecode[0] = bytes1(uint8(sourceCount));
 
                 uint256 sourcesRelativeStart = 1 + sourceCount * 2;
@@ -59,7 +62,11 @@ abstract contract BytecodeTest is Test {
                 uint256 offset = 0;
                 uint256 cursor = 1;
                 for (uint256 i = 0; i < sourceCount; i++) {
+                    // Offset being set one byte at a time so tyecast truncation
+                    // is intentional.
+                    //forge-lint: disable-next-line(unsafe-typecast)
                     bytecode[cursor] = bytes1(uint8(offset >> 8));
+                    //forge-lint: disable-next-line(unsafe-typecast)
                     bytecode[cursor + 1] = bytes1(uint8(offset));
                     cursor += 2;
 
@@ -75,9 +82,14 @@ abstract contract BytecodeTest is Test {
 
                     // inputs can't exceed outputs.
                     inputs = bound(inputs, 0, outputs);
+                    // inputs is bound to outputs, which is a single byte, so
+                    // this is a safe cast.
+                    //forge-lint: disable-next-line(unsafe-typecast)
                     bytecode[headerPosition + 2] = bytes1(uint8(inputs));
                     // allocation can't be less than outputs.
                     allocation = bound(allocation, outputs, type(uint8).max);
+                    // Allocation is bound so safe to typecast.
+                    //forge-lint: disable-next-line(unsafe-typecast)
                     bytecode[headerPosition + 1] = bytes1(uint8(allocation));
 
                     offset += opsPerSource[i] * 4 + 4;

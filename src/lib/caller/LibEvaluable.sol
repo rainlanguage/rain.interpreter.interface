@@ -3,7 +3,11 @@
 pragma solidity ^0.8.25;
 
 /// Export dispair interfaces for convenience downstream.
+// Exported for convenience.
+//forge-lint: disable-next-line(unused-import)
 import {IInterpreterStoreV2} from "../../interface/IInterpreterStoreV2.sol";
+// Exported for convenience.
+//forge-lint: disable-next-line(unused-import)
 import {IInterpreterV2} from "../../interface/deprecated/IInterpreterV2.sol";
 import {EvaluableV2} from "../../interface/deprecated/IInterpreterCallerV2.sol";
 

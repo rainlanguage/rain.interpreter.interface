@@ -29,7 +29,8 @@ library LibEncodedDispatch {
         // values to uint16.
         return EncodedDispatch.wrap(
             (uint256(uint160(expression)) << 0x20) | (uint256(uint16(SourceIndexV2.unwrap(sourceIndex))) << 0x10)
-                | uint256(uint16(maxOutputs))
+            // forge-lint: disable-next-line(unsafe-typecast)
+            | uint256(uint16(maxOutputs))
         );
     }
 
