@@ -6,7 +6,7 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibHashNoAlloc, HASH_NIL} from "rain.lib.hash/LibHashNoAlloc.sol";
 
 import {SignatureChecker} from "openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
-import {ECDSA} from "openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+import {MessageHashUtils} from "openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol";
 
 import {
     SignedContextV1,
@@ -192,7 +192,7 @@ library LibContext {
                         // a single encoded output.
                         !SignatureChecker.isValidSignatureNow(
                             signedContexts[i].signer,
-                            ECDSA.toEthSignedMessageHash(LibHashNoAlloc.hashWords(signedContexts[i].context)),
+                            MessageHashUtils.toEthSignedMessageHash(LibHashNoAlloc.hashWords(signedContexts[i].context)),
                             signedContexts[i].signature
                         )
                     ) {
