@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibContext, ECDSA, LibHashNoAlloc, SignedContextV1} from "src/lib/caller/LibContext.sol";
+import {LibContext, MessageHashUtils, LibHashNoAlloc, SignedContextV1} from "src/lib/caller/LibContext.sol";
 import {LibContextSlow} from "./LibContextSlow.sol";
 
 contract LibContextTest is Test {
@@ -28,7 +28,7 @@ contract LibContextTest is Test {
         bytes32 signerPrivateKey = bytes32(0x61b952d0c26214380daf3ca0a8ec9316682d63673db12d723c30417c86dbfca2);
         (signerPrivateKey);
 
-        bytes32 toSign = ECDSA.toEthSignedMessageHash(LibHashNoAlloc.hashWords(unsignedContext));
+        bytes32 toSign = MessageHashUtils.toEthSignedMessageHash(LibHashNoAlloc.hashWords(unsignedContext));
         (toSign);
 
         SignedContextV1[] memory signedContexts = new SignedContextV1[](1);
