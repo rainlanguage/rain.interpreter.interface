@@ -48,9 +48,7 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
 
     /// If the relative offsets are truncated the bytecode fails as
     /// `TruncatedHeaderOffsets`.
-    function testCheckNoOOBPointersOffsetsTruncated(bytes memory bytecode, uint8 sourceCount, uint256 length)
-        external
-    {
+    function testCheckNoOOBPointersOffsetsTruncated(bytes memory bytecode, uint8 sourceCount, uint256 length) external {
         vm.assume(sourceCount > 0);
         vm.assume(bytecode.length > 0);
         bytecode[0] = bytes1(sourceCount);

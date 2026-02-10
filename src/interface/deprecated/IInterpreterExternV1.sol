@@ -19,8 +19,5 @@ interface IInterpreterExternV1 {
     /// Analogous to the opcode/operand in the interpreter.
     /// @param inputs The array of inputs for the dispatched logic.
     /// @return outputs The result of the dispatched logic.
-    function extern(ExternDispatch dispatch, uint256[] memory inputs)
-        external
-        view
-        returns (uint256[] memory outputs);
+    function extern(ExternDispatch dispatch, uint256[] memory inputs) external view returns (uint256[] memory outputs);
 }

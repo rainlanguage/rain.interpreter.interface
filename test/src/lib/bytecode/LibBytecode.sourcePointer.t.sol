@@ -8,11 +8,7 @@ import {LibBytecodeSlow} from "test/src/lib/bytecode/LibBytecodeSlow.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 contract LibBytecodeSourcePointerTest is BytecodeTest {
-    function sourcePointerExternal(bytes memory bytecode, uint256 sourceIndex)
-        external
-        pure
-        returns (Pointer pointer)
-    {
+    function sourcePointerExternal(bytes memory bytecode, uint256 sourceIndex) external pure returns (Pointer pointer) {
         return LibBytecode.sourcePointer(bytecode, sourceIndex);
     }
 

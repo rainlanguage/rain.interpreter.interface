@@ -29,9 +29,8 @@ library LibBytecodeSlow {
     }
 
     function sourcePointerSlow(bytes memory bytecode, uint256 sourceIndex) internal pure returns (Pointer) {
-        return bytecode.dataPointer().unsafeAddBytes(
-            sourceRelativeOffsetSlow(bytecode, sourceIndex) + 1 + sourceCountSlow(bytecode) * 2
-        );
+        return bytecode.dataPointer()
+            .unsafeAddBytes(sourceRelativeOffsetSlow(bytecode, sourceIndex) + 1 + sourceCountSlow(bytecode) * 2);
     }
 
     /// source count is the top byte of the first word of the source header.

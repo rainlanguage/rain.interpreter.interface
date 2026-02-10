@@ -7,15 +7,16 @@ pragma solidity ^0.8.18;
 import {IParserV2} from "../IParserV2.sol";
 import {IInterpreterStoreV3} from "./IInterpreterStoreV3.sol";
 import {IInterpreterV4} from "./IInterpreterV4.sol";
-import
-// Exported for convenience.
-//forge-lint: disable-start(unused-import)
-{
+import {
+
+    // Exported for convenience.
+    //forge-lint: disable-start(unused-import)
     SignedContextV1,
     SIGNED_CONTEXT_SIGNER_OFFSET,
     SIGNED_CONTEXT_CONTEXT_OFFSET,
     SIGNED_CONTEXT_SIGNATURE_OFFSET
 } from "../IInterpreterCallerV3.sol";
+
 //forge-lint: disable-end
 
 /// @param interpreter Will evaluate the expression.
