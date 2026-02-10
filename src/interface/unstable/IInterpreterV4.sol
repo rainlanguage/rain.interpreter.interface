@@ -4,25 +4,32 @@ pragma solidity ^0.8.25;
 
 import {
     FullyQualifiedNamespace,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     StateNamespace,
     SourceIndexV2,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     DEFAULT_STATE_NAMESPACE,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     OPCODE_CONSTANT,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     OPCODE_CONTEXT,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     OPCODE_EXTERN,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     OPCODE_UNKNOWN,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     OPCODE_STACK
@@ -91,8 +98,5 @@ interface IInterpreterV4 {
     ///   unless/until they are set to something else in the evaluated logic.
     /// - Numbers are treated as packed Rain decimal floats, NOT fixed point
     ///   decimals.
-    function eval4(EvalV4 calldata eval)
-        external
-        view
-        returns (StackItem[] calldata stack, bytes32[] calldata writes);
+    function eval4(EvalV4 calldata eval) external view returns (StackItem[] calldata stack, bytes32[] calldata writes);
 }

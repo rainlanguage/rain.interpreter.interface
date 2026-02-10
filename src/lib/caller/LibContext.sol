@@ -192,7 +192,9 @@ library LibContext {
                         // a single encoded output.
                         !SignatureChecker.isValidSignatureNow(
                             signedContexts[i].signer,
-                            MessageHashUtils.toEthSignedMessageHash(LibHashNoAlloc.hashWords(signedContexts[i].context)),
+                            MessageHashUtils.toEthSignedMessageHash(
+                                LibHashNoAlloc.hashWords(signedContexts[i].context)
+                            ),
                             signedContexts[i].signature
                         )
                     ) {

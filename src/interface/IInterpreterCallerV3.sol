@@ -7,15 +7,16 @@ pragma solidity ^0.8.18;
 import {IParserV2} from "./IParserV2.sol";
 import {IInterpreterStoreV2} from "./IInterpreterStoreV2.sol";
 import {IInterpreterV3} from "./IInterpreterV3.sol";
-import
-// Exported for convenience.
-//forge-lint: disable-start(unused-import)
-{
+import {
+
+    // Exported for convenience.
+    //forge-lint: disable-start(unused-import)
     SignedContextV1,
     SIGNED_CONTEXT_SIGNER_OFFSET,
     SIGNED_CONTEXT_CONTEXT_OFFSET,
     SIGNED_CONTEXT_SIGNATURE_OFFSET
 } from "./deprecated/IInterpreterCallerV2.sol";
+
 //forge-lint: disable-end
 
 /// Struct over the return of `IParserV2.parse2` which MAY be more convenient to
