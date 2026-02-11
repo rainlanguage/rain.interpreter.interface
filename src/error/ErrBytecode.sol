@@ -2,9 +2,6 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-/// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
-contract ErrBytecode {}
-
 /// Thrown when a bytecode source index is out of bounds.
 /// @param sourceIndex The source index that was out of bounds.
 /// @param bytecode The bytecode that was inspected.
