@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 // Exported for convenience.
 //forge-lint: disable-next-line(unused-import)
-import {EncodedExternDispatch, ExternDispatch} from "./deprecated/IInterpreterExternV2.sol";
+import {EncodedExternDispatch, ExternDispatch} from "../v1/IInterpreterExternV2.sol";
 
 /// @title IInterpreterExternV3
 /// Handle a single dispatch from some calling contract with an array of

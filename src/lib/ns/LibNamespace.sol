@@ -2,8 +2,12 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-import {StateNamespace, FullyQualifiedNamespace} from "../../interface/IInterpreterV3.sol";
+import {StateNamespace, FullyQualifiedNamespace} from "../../interface/IInterpreterV4.sol";
 
+/// @title LibNamespace
+/// @notice Conventions for working with namespaces as a calling contract. All of
+/// this functionality is OPTIONAL but probably useful for the majority of
+/// contracts as it enables safe (scoped) mutations in Rainlang.
 library LibNamespace {
     /// Standard way to elevate a caller-provided state namespace to a universal
     /// namespace that is disjoint from all other caller-provided namespaces.

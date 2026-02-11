@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.18;
 
-import {IInterpreterStoreV2} from "../IInterpreterStoreV2.sol";
+import {IInterpreterStoreV2} from "../v2/IInterpreterStoreV2.sol";
 import {IInterpreterV2} from "./IInterpreterV2.sol";
 
 string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V4 = "IExpressionDeployerV4";

@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 // Reexport AuthoringMetaV2 for downstream use.
 //forge-lint: disable-next-line(unused-import)
-import {AuthoringMetaV2} from "./deprecated/IParserV1.sol";
+import {AuthoringMetaV2} from "./deprecated/v1/IParserV1.sol";
 
 interface IParserV2 {
     function parse2(bytes calldata data) external view returns (bytes calldata bytecode);

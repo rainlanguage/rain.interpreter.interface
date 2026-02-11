@@ -38,7 +38,7 @@ import {
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     OPCODE_STACK
-} from "./deprecated/IInterpreterV2.sol";
+} from "../v1/IInterpreterV2.sol";
 
 interface IInterpreterV3 {
     function functionPointers() external view returns (bytes calldata);

@@ -25,7 +25,23 @@ uint256 constant FINGERPRINT_MASK = 0xFFFFFF;
 /// @dev 33 = 32 bytes for expansion + 1 byte for seed
 uint256 constant META_EXPANSION_SIZE = 0x21;
 
+/// @title LibParseMeta
+/// @notice Common logic for working with parse meta, which is the data structure
+/// used to store information about the words in a parser. The parse meta is
+/// designed to be compact and efficient to lookup.
 library LibParseMeta {
+    /// @dev Given a word and a seed, return the bitmap and fingerprint for the
+    /// word. The bitmap is a uint256 with a single bit set, which can be used
+    /// to check if the word is present in an expansion. The fingerprint is a
+    /// uint256 with the low 3 bytes set, which can be used to check for
+    /// collisions when a word is found in an expansion.
+    /// @param seed The seed to use for the bitmap, which should be a byte value
+    /// between 0 and 255.
+    /// @param word The word to generate the bitmap and fingerprint for.
+    /// @return bitmap A uint256 with a single bit set, which can be used to
+    /// check if the word is present in an expansion.
+    /// @return hashed A uint256 with the low 3 bytes set, which can be used to
+    /// check for collisions when a word is found in an expansion.
     function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256 bitmap, uint256 hashed) {
         assembly ("memory-safe") {
             mstore(0, word)

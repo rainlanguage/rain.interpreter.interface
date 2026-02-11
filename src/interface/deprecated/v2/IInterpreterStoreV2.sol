@@ -4,9 +4,9 @@ pragma solidity ^0.8.18;
 
 // Exported for convenience.
 //forge-lint: disable-next-line(unused-import)
-import {StateNamespace, FullyQualifiedNamespace, NO_STORE} from "../IInterpreterStoreV2.sol";
+import {StateNamespace, FullyQualifiedNamespace, NO_STORE} from "../v1/IInterpreterStoreV1.sol";
 
-/// @title IInterpreterStoreV3
+/// @title IInterpreterStoreV2
 /// @notice Tracks state changes on behalf of an interpreter. A single store can
 /// handle state changes for many calling contracts, many interpreters and many
 /// expressions. The store is responsible for ensuring that applying these state
@@ -28,24 +28,24 @@ import {StateNamespace, FullyQualifiedNamespace, NO_STORE} from "../IInterpreter
 /// it can detect invalid state changes, such as a key/value list having an odd
 /// number of items, but this MAY NOT be possible if the corruption is
 /// undetectable.
-interface IInterpreterStoreV3 {
+interface IInterpreterStoreV2 {
     /// MUST be emitted by the store on `set` to its internal storage.
     /// @param namespace The fully qualified namespace that the store is setting.
     /// @param key The key that the store is setting.
     /// @param value The value that the store is setting.
-    event Set(FullyQualifiedNamespace namespace, bytes32 key, bytes32 value);
+    event Set(FullyQualifiedNamespace namespace, uint256 key, uint256 value);
 
     /// Mutates the interpreter store in bulk. The bulk values are provided in
-    /// the form of a `bytes32[]` which can be treated e.g. as pairwise keys and
-    /// values to be stored in a Solidity mapping. The `IInterpreterStoreV3`
-    /// defines the meaning of the `bytes32[]` for its own storage logic.
+    /// the form of a `uint256[]` which can be treated e.g. as pairwise keys and
+    /// values to be stored in a Solidity mapping. The `IInterpreterStoreV2`
+    /// defines the meaning of the `uint256[]` for its own storage logic.
     ///
     /// @param namespace The unqualified namespace for the set that MUST be
-    /// fully qualified by the `IInterpreterStoreV3` to prevent key collisions
+    /// fully qualified by the `IInterpreterStoreV2` to prevent key collisions
     /// between callers. The fully qualified namespace forms a compound key with
     /// the keys for each value to set.
     /// @param kvs The list of changes to apply to the store's internal state.
-    function set(StateNamespace namespace, bytes32[] calldata kvs) external;
+    function set(StateNamespace namespace, uint256[] calldata kvs) external;
 
     /// Given a fully qualified namespace and key, return the associated value.
     /// Ostensibly the interpreter can use this to implement opcodes that read
@@ -57,10 +57,10 @@ interface IInterpreterStoreV3 {
     /// and set while the state changes are still in memory in the calling
     /// context and haven't yet been persisted to the store.
     ///
-    /// `IInterpreterStoreV3` uses the same fallback behaviour for unset keys as
+    /// `IInterpreterStoreV2` uses the same fallback behaviour for unset keys as
     /// Solidity. Specifically, any UNSET VALUES SILENTLY FALLBACK TO `0`.
     /// @param namespace The fully qualified namespace to get a single value for.
     /// @param key The key to get the value for within the namespace.
     /// @return The value OR ZERO IF NOT SET.
-    function get(FullyQualifiedNamespace namespace, bytes32 key) external view returns (bytes32);
+    function get(FullyQualifiedNamespace namespace, uint256 key) external view returns (uint256);
 }
