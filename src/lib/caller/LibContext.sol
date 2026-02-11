@@ -16,12 +16,21 @@ import {
 } from "../../interface/IInterpreterCallerV4.sol";
 
 /// Thrown when the ith signature from a list of signed contexts is invalid.
+/// @param i The index of the invalid signature in the list of signed contexts.
 error InvalidSignature(uint256 i);
 
+/// @dev CONTEXT_BASE_COLUMN and CONTEXT_BASE_ROWS are the dimensions of the base
+/// context provided by `LibContext.base()`. These constants are not required to
+/// use the base context but are provided for convenience when working with it.
 uint256 constant CONTEXT_BASE_COLUMN = 0;
+/// @dev CONTEXT_BASE_ROWS is the number of rows in the base context, which is
+/// always 2 for the `msg.sender` and address of the calling contract.
 uint256 constant CONTEXT_BASE_ROWS = 2;
 
+/// @dev The row index of the `msg.sender` in the base context.
 uint256 constant CONTEXT_BASE_ROW_SENDER = 0;
+/// @dev The row index of the address of the calling contract in the base
+/// context.
 uint256 constant CONTEXT_BASE_ROW_CALLING_CONTRACT = 1;
 
 /// @title LibContext

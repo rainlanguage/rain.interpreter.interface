@@ -20,7 +20,32 @@ uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
 /// @dev For metadata builder.
 error DuplicateFingerprint();
 
+/// @title LibGenParseMeta
+/// @notice Library for building parse meta from authoring meta, and generating
+/// constant strings for the parse meta to be used in generated code. The parse
+/// meta is a bytes array that is used to lookup word definitions. The parse meta
+/// is built from the authoring meta, which is an array of `AuthoringMetaV2` that
+/// contains the word and its corresponding opcode index. The parse meta is
+/// structured in a way that allows for efficient lookups of word definitions
+/// using bloom filters and fingerprints. The library provides functions to find
+/// the best expander for a given set of authoring meta, build the parse meta
+/// from the authoring meta and build depth, and generate a constant string for
+/// the parse meta with a comment describing its structure. The main purpose of
+/// this library is to optimize the size of the parse meta while maintaining
+/// efficient lookups, which is important for the performance of the interpreter.
 library LibGenParseMeta {
+    /// @dev Finds the best expander for a given set of authoring meta. The best
+    /// expander is the one that produces the densest bloom filter at each depth,
+    /// which minimizes the number of items that need to be checked for each
+    /// lookup. The function returns the best seed, the corresponding expansion,
+    /// and the remaining authoring meta that could not be expanded with this
+    /// seed. The remaining authoring meta can then be used to find the next best
+    /// expander until all authoring meta has been expanded.
+    /// @param metas The authoring meta to find the best expander for.
+    /// @return bestSeed The best seed for the given authoring meta.
+    /// @return bestExpansion The corresponding expansion for the best seed.
+    /// @return remaining The remaining authoring meta that could not be expanded
+    /// with the best seed.
     function findBestExpander(AuthoringMetaV2[] memory metas)
         internal
         pure
@@ -72,6 +97,32 @@ library LibGenParseMeta {
         }
     }
 
+    /// @dev Builds the parse meta from the authoring meta and build depth. The
+    /// parse meta is a bytes array with the following structure:
+    /// - 1 byte: The depth of the bloom filters
+    /// - 1 byte: The hashing seed
+    /// - The bloom filters, each is 32 bytes long, one for each build depth
+    /// - All the items for each word, each is 4 bytes long. Each item's first
+    ///   byte is its opcode index, the remaining 3 bytes are the word
+    ///   fingerprint.
+    /// The parse meta is used to lookup word definitions. To do a lookup, the
+    /// word is hashed with the seed, then the first byte of the hash is compared
+    /// against the bloom filter. If there is a hit then we count the number of
+    /// 1 bits in the bloom filter up to this item's 1 bit. We then treat this
+    /// as the index of the item in the items array. We then compare the word
+    /// fingerprint against the fingerprint of the item at this index. If the
+    /// fingerprints equal then we have a match, else we increment the seed and
+    /// try again with the next bloom filter, offsetting all the indexes by the
+    /// total bit count of the previous bloom filter. If we reach the end of the
+    /// bloom filters then we have a miss.
+    /// @param authoringMeta The authoring meta to build the parse meta from.
+    /// @param maxDepth The maximum depth of the bloom filters to use. This is a
+    /// tradeoff between the size of the parse meta and the speed of lookups. The
+    /// main reason to increase the depth is during generation there may be an
+    /// unresolvable collision at a certain depth, so we need to increase the
+    /// depth to resolve it.
+    /// @return parseMeta The parse meta built from the authoring meta and build
+    /// depth.
     function buildParseMetaV2(AuthoringMetaV2[] memory authoringMeta, uint8 maxDepth)
         internal
         pure
@@ -178,6 +229,15 @@ library LibGenParseMeta {
         }
     }
 
+    /// @dev Builds a constant string containing the parse meta, which can be
+    /// used in generated code. The string also includes a comment describing the
+    /// structure of the parse meta for future reference.
+    /// @param vm The Vm instance to use for generating the constant string.
+    /// @param authoringMetaBytes The abi-encoded authoring meta to build the
+    /// parse meta from.
+    /// @param buildDepth The build depth to use for the parse meta.
+    /// @return A constant string containing the parse meta, with a comment
+    /// describing its structure.
     function parseMetaConstantString(Vm vm, bytes memory authoringMetaBytes, uint8 buildDepth)
         internal
         pure
