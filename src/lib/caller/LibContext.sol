@@ -13,7 +13,7 @@ import {
     SIGNED_CONTEXT_SIGNER_OFFSET,
     SIGNED_CONTEXT_SIGNATURE_OFFSET,
     SIGNED_CONTEXT_CONTEXT_OFFSET
-} from "../../interface/IInterpreterCallerV3.sol";
+} from "../../interface/IInterpreterCallerV4.sol";
 
 /// Thrown when the ith signature from a list of signed contexts is invalid.
 error InvalidSignature(uint256 i);

@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 // Reexports for implementations to use.
 //forge-lint: disable-next-line(unused-import)
-import {AuthoringMetaV2} from "../ISubParserV3.sol";
+import {AuthoringMetaV2} from "./deprecated/v2/ISubParserV3.sol";
 //forge-lint: disable-next-line(unused-import)
 import {OperandV2} from "./IInterpreterV4.sol";
 

@@ -5,7 +5,7 @@ pragma solidity ^0.8.18;
 // Exported for convenience.
 //forge-lint: disable-next-line(unused-import)
 import {EncodedDispatch, StateNamespace, Operand, DEFAULT_STATE_NAMESPACE} from "./IInterpreterV1.sol";
-import {FullyQualifiedNamespace, IInterpreterStoreV2} from "../IInterpreterStoreV2.sol";
+import {FullyQualifiedNamespace, IInterpreterStoreV2} from "../v2/IInterpreterStoreV2.sol";
 
 /// @dev For maximum compatibility with external contracts, the `IInterpreterV2`
 /// should implement an opcode that reads from the stack by index as opcode `0`.

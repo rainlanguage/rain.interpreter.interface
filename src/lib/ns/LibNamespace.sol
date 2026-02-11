@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-import {StateNamespace, FullyQualifiedNamespace} from "../../interface/IInterpreterV3.sol";
+import {StateNamespace, FullyQualifiedNamespace} from "../../interface/IInterpreterV4.sol";
 
 library LibNamespace {
     /// Standard way to elevate a caller-provided state namespace to a universal
