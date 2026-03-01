@@ -50,8 +50,7 @@ contract LibGenParseMetaFindExpanderTest is Test {
         for (uint256 i = 0; i < 64; i++) {
             metas[i] = AuthoringMetaV2({word: bytes32(i), description: ""});
         }
-        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) =
-            LibGenParseMeta.findBestExpander(metas);
+        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) = LibGenParseMeta.findBestExpander(metas);
         uint256 expandedCount = LibCtPop.ctpop(bestExpansion);
         assertEq(remaining.length, 64 - expandedCount);
     }
@@ -60,8 +59,7 @@ contract LibGenParseMetaFindExpanderTest is Test {
     function testFindExpanderSingleWord(bytes32 word) external pure {
         AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](1);
         metas[0] = AuthoringMetaV2({word: word, description: ""});
-        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) =
-            LibGenParseMeta.findBestExpander(metas);
+        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) = LibGenParseMeta.findBestExpander(metas);
         assertEq(LibCtPop.ctpop(bestExpansion), 1);
         assertEq(remaining.length, 0);
     }
@@ -70,8 +68,7 @@ contract LibGenParseMetaFindExpanderTest is Test {
     /// must always hold.
     function testFindExpanderInvariant(AuthoringMetaV2[] memory authoringMeta) external pure {
         vm.assume(!LibBloom.bloomFindsDupes(LibAuthoringMeta.copyWordsFromAuthoringMeta(authoringMeta)));
-        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) =
-            LibGenParseMeta.findBestExpander(authoringMeta);
+        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) = LibGenParseMeta.findBestExpander(authoringMeta);
         uint256 expandedCount = LibCtPop.ctpop(bestExpansion);
         assertEq(expandedCount + remaining.length, authoringMeta.length);
     }

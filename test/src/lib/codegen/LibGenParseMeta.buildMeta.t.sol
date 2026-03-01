@@ -24,6 +24,7 @@ contract LibGenParseMetaBuildMetaTest is Test {
         assertEq(META_ITEM_MASK, (1 << (META_ITEM_SIZE * 8)) - 1);
         assertEq(META_ITEM_MASK, type(uint32).max);
     }
+
     function buildParseMetaV2External(AuthoringMetaV2[] memory authoringMeta, uint8 maxDepth)
         external
         pure
@@ -239,8 +240,7 @@ contract LibGenParseMetaBuildMetaTest is Test {
     function testParseMetaConstantStringFuzz(AuthoringMetaV2[] memory authoringMeta) external pure {
         vm.assume(!LibBloom.bloomFindsDupes(LibAuthoringMeta.copyWordsFromAuthoringMeta(authoringMeta)));
         bytes memory encoded = abi.encode(authoringMeta);
-        string memory result =
-            LibGenParseMeta.parseMetaConstantString(vm, encoded, expanderDepth(authoringMeta.length));
+        string memory result = LibGenParseMeta.parseMetaConstantString(vm, encoded, expanderDepth(authoringMeta.length));
         assertTrue(bytes(result).length > 0);
     }
 }

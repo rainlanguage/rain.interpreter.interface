@@ -153,6 +153,7 @@ contract LibParseMetaLookupWordTest is Test {
         meta[itemOffset + 2] = bytes1(uint8((wordFingerprint >> 8) & 0xFF));
         meta[itemOffset + 3] = bytes1(uint8(wordFingerprint & 0xFF));
     }
+
     /// Build meta from known words, look them all up, verify indices.
     function testLookupWordKnown() external pure {
         AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](3);

@@ -64,6 +64,7 @@ library LibGenParseMeta {
                 for (uint256 seed = 0; seed <= type(uint8).max; seed++) {
                     uint256 expansion = 0;
                     for (uint256 i = 0; i < metas.length; i++) {
+                        //slither-disable-next-line unused-return
                         (uint256 shifted,) = LibParseMeta.wordBitmapped(seed, metas[i].word);
                         expansion = shifted | expansion;
                     }
@@ -91,6 +92,7 @@ library LibGenParseMeta {
             uint256 usedExpansion = 0;
             uint256 j = 0;
             for (uint256 i = 0; i < metas.length; i++) {
+                //slither-disable-next-line unused-return
                 (uint256 shifted,) = LibParseMeta.wordBitmapped(bestSeed, metas[i].word);
                 if ((shifted & usedExpansion) == 0) {
                     usedExpansion = shifted | usedExpansion;

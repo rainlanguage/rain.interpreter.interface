@@ -67,6 +67,7 @@ library LibParseMeta {
             }
         }
     }
+
     /// @dev Given a word and a seed, return the bitmap and fingerprint for the
     /// word. The bitmap is a uint256 with a single bit set, which can be used
     /// to check if the word is present in an expansion. The fingerprint is a
