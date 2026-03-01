@@ -11,10 +11,73 @@ import {
     META_ITEM_SIZE,
     FINGERPRINT_MASK,
     META_EXPANSION_SIZE,
-    META_PREFIX_SIZE
+    META_PREFIX_SIZE,
+    InvalidParseMeta
 } from "src/lib/parse/LibParseMeta.sol";
 
 contract LibParseMetaLookupWordTest is Test {
+    function checkParseMetaStructureExternal(bytes memory meta) external pure {
+        LibParseMeta.checkParseMetaStructure(meta);
+    }
+
+    /// buildParseMetaV2 output must always pass structural validation.
+    function testCheckParseMetaStructureBuildOutput() external pure {
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](3);
+        metas[0] = AuthoringMetaV2({word: bytes32("add"), description: ""});
+        metas[1] = AuthoringMetaV2({word: bytes32("sub"), description: ""});
+        metas[2] = AuthoringMetaV2({word: bytes32("mul"), description: ""});
+        bytes memory meta = LibGenParseMeta.buildParseMetaV2(metas, 8);
+        LibParseMeta.checkParseMetaStructure(meta);
+    }
+
+    /// Fuzz: any well-formed buildParseMetaV2 output passes validation.
+    function testCheckParseMetaStructureFuzz(AuthoringMetaV2[] memory authoringMeta) external pure {
+        vm.assume(authoringMeta.length > 0);
+        vm.assume(authoringMeta.length <= 64);
+        vm.assume(!LibBloom.bloomFindsDupes(LibAuthoringMeta.copyWordsFromAuthoringMeta(authoringMeta)));
+        uint8 depth = uint8(authoringMeta.length / type(uint8).max + 3);
+        bytes memory meta = LibGenParseMeta.buildParseMetaV2(authoringMeta, depth);
+        LibParseMeta.checkParseMetaStructure(meta);
+    }
+
+    /// Truncated meta should fail validation.
+    function testCheckParseMetaStructureTruncated() external {
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](1);
+        metas[0] = AuthoringMetaV2({word: bytes32("add"), description: ""});
+        bytes memory meta = LibGenParseMeta.buildParseMetaV2(metas, 8);
+
+        // Truncate by 1 byte.
+        bytes memory truncated = new bytes(meta.length - 1);
+        for (uint256 i = 0; i < truncated.length; i++) {
+            truncated[i] = meta[i];
+        }
+        vm.expectRevert();
+        this.checkParseMetaStructureExternal(truncated);
+    }
+
+    /// Extra trailing bytes should fail validation.
+    function testCheckParseMetaStructureExtraBytes() external {
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](1);
+        metas[0] = AuthoringMetaV2({word: bytes32("add"), description: ""});
+        bytes memory meta = LibGenParseMeta.buildParseMetaV2(metas, 8);
+
+        // Append 1 extra byte.
+        bytes memory extended = new bytes(meta.length + 1);
+        for (uint256 i = 0; i < meta.length; i++) {
+            extended[i] = meta[i];
+        }
+        vm.expectRevert();
+        this.checkParseMetaStructureExternal(extended);
+    }
+
+    /// Empty meta (zero length) should fail validation.
+    function testCheckParseMetaStructureEmpty() external {
+        bytes memory meta = new bytes(0);
+        // depth=0, 0 expansions, 0 items → expected length = 1.
+        vm.expectRevert();
+        this.checkParseMetaStructureExternal(meta);
+    }
+
     /// Demonstrates M01: lookupWord does not check whether the word's bit is
     /// actually set in the bloom filter expansion before comparing fingerprints.
     /// We construct raw meta bytes where:

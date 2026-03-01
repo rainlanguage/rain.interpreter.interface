@@ -25,11 +25,48 @@ uint256 constant FINGERPRINT_MASK = 0xFFFFFF;
 /// @dev 33 = 32 bytes for expansion + 1 byte for seed
 uint256 constant META_EXPANSION_SIZE = 0x21;
 
+/// @dev Thrown by `checkParseMetaStructure` when the meta bytes do not match
+/// the expected length derived from its depth and expansion data.
+/// @param expected The expected byte length.
+/// @param actual The actual byte length.
+error InvalidParseMeta(uint256 expected, uint256 actual);
+
 /// @title LibParseMeta
 /// @notice Common logic for working with parse meta, which is the data structure
 /// used to store information about the words in a parser. The parse meta is
 /// designed to be compact and efficient to lookup.
 library LibParseMeta {
+    /// Validates that the parse meta has a structurally consistent length.
+    /// Reads the depth and all expansions to compute the expected total byte
+    /// count, then reverts if `meta.length` does not match. Intended to be
+    /// called once at build time so that `lookupWord` can trust the meta
+    /// without per-call bounds checks.
+    /// @param meta The parse meta bytes to validate.
+    function checkParseMetaStructure(bytes memory meta) internal pure {
+        unchecked {
+            uint256 depth;
+            uint256 totalItems = 0;
+            assembly ("memory-safe") {
+                depth := and(mload(add(meta, 1)), 0xFF)
+            }
+            uint256 cursor;
+            assembly ("memory-safe") {
+                cursor := add(meta, 1)
+            }
+            for (uint256 i = 0; i < depth; i++) {
+                uint256 expansion;
+                assembly ("memory-safe") {
+                    cursor := add(cursor, 0x21)
+                    expansion := mload(cursor)
+                }
+                totalItems += LibCtPop.ctpop(expansion);
+            }
+            uint256 expected = META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + totalItems * META_ITEM_SIZE;
+            if (meta.length != expected) {
+                revert InvalidParseMeta(expected, meta.length);
+            }
+        }
+    }
     /// @dev Given a word and a seed, return the bitmap and fingerprint for the
     /// word. The bitmap is a uint256 with a single bit set, which can be used
     /// to check if the word is present in an expansion. The fingerprint is a
@@ -73,7 +110,8 @@ library LibParseMeta {
     /// MUST check `exists` before using the other return values.
     /// The `meta` parameter MUST be well-formed as produced by
     /// `LibGenParseMeta.buildParseMetaV2`. Behavior is undefined for malformed
-    /// meta — no bounds checking is performed on the meta structure.
+    /// meta — no bounds checking is performed on the meta structure. Use
+    /// `checkParseMetaStructure` to validate meta at build time.
     /// @param meta The parser meta.
     /// @param word The word to lookup.
     /// @return True if the word exists in the parse meta.
