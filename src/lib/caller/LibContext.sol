@@ -161,9 +161,10 @@ library LibContext {
     /// order, rather than relying on the `msg.sender` to honestly present data
     /// in any particular structure/order.
     /// @return The fully assembled context matrix. Column 0 is the base context
-    /// from `LibContext.base()`. Subsequent columns are from `baseContext`,
-    /// followed by a signers column (each signer address cast to `bytes32`),
-    /// followed by each signed context's data as individual columns.
+    /// from `LibContext.base()`. Subsequent columns are from `baseContext`.
+    /// If signed contexts are provided, those are followed by a signers column
+    /// (each signer address cast to `bytes32`) and then each signed context's
+    /// data as individual columns.
     function build(bytes32[][] memory baseContext, SignedContextV1[] memory signedContexts)
         internal
         view
