@@ -7,8 +7,89 @@ import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibGenParseMeta} from "src/lib/codegen/LibGenParseMeta.sol";
 import {LibAuthoringMeta, AuthoringMetaV2} from "test/lib/meta/LibAuthoringMeta.sol";
 import {LibBloom} from "test/lib/bloom/LibBloom.sol";
+import {
+    META_ITEM_SIZE,
+    FINGERPRINT_MASK,
+    META_EXPANSION_SIZE,
+    META_PREFIX_SIZE
+} from "src/lib/parse/LibParseMeta.sol";
 
 contract LibParseMetaLookupWordTest is Test {
+    /// Demonstrates M01: lookupWord does not check whether the word's bit is
+    /// actually set in the bloom filter expansion before comparing fingerprints.
+    /// We construct raw meta bytes where:
+    /// - The expansion has a single bit set (NOT the lookup word's bit)
+    /// - The item at position 0 has a fingerprint matching the lookup word
+    /// This should return (false, 0) but currently returns (true, fakeIndex)
+    /// because the bit-set check is missing.
+    function testLookupWordMissingBitCheck() external pure {
+        bytes32 word = bytes32("notinmeta");
+        uint8 seed = 0;
+
+        // Compute word's bitmap and fingerprint, then build crafted meta.
+        bytes memory meta = _buildM01Meta(word, seed);
+
+        // lookupWord should return (false, 0) because the word's bit is NOT
+        // set in the expansion. But due to M01, it returns (true, 42).
+        (bool exists, uint256 index) = LibParseMeta.lookupWord(meta, word);
+        assertFalse(exists, "M01: word bit not set in expansion, should not match");
+        assertEq(index, 0, "M01: index should be 0 for not-found");
+    }
+
+    /// Fuzz variant of M01: any word should fail to match when its bit is not
+    /// set in the expansion, regardless of fingerprint.
+    function testLookupWordMissingBitCheckFuzz(bytes32 word, uint8 seed) external pure {
+        bytes memory meta = _buildM01Meta(word, seed);
+
+        (bool exists, uint256 index) = LibParseMeta.lookupWord(meta, word);
+        assertFalse(exists, "M01 fuzz: word bit not set, should not match");
+        assertEq(index, 0, "M01 fuzz: index should be 0 for not-found");
+    }
+
+    /// Constructs a crafted meta that triggers M01. The meta has one bloom
+    /// layer with a single bit set that is NOT the lookup word's bit. The item
+    /// at the position lookupWord will compute has a fingerprint matching the
+    /// word. Without the bit-set check, lookupWord returns a false positive.
+    function _buildM01Meta(bytes32 word, uint8 seed) internal pure returns (bytes memory meta) {
+        (uint256 shifted, uint256 hashed) = LibParseMeta.wordBitmapped(seed, word);
+        uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
+
+        // Find the word's bit position.
+        uint256 bitPos;
+        for (uint256 i = 0; i < 256; i++) {
+            if (shifted == (1 << i)) {
+                bitPos = i;
+                break;
+            }
+        }
+
+        // Pick a different bit ABOVE the word's bit so ctpop gives pos = 0.
+        // Wrap around if needed — the key requirement is the bit differs.
+        uint256 fakeBitPos = (bitPos + 128) % 256;
+        uint256 fakeExpansion = 1 << fakeBitPos;
+
+        // Determine what pos lookupWord will compute:
+        // pos = ctpop(expansion & (shifted - 1))
+        uint256 expectedPos = (fakeBitPos < bitPos) ? uint256(1) : uint256(0);
+
+        uint256 numItems = expectedPos + 1;
+        meta = new bytes(META_PREFIX_SIZE + META_EXPANSION_SIZE + numItems * META_ITEM_SIZE);
+
+        // Write depth, seed, expansion.
+        meta[0] = bytes1(uint8(1));
+        meta[1] = bytes1(seed);
+        for (uint256 i = 0; i < 32; i++) {
+            meta[2 + i] = bytes1(uint8((fakeExpansion >> (8 * (31 - i))) & 0xFF));
+        }
+
+        // Write item at expectedPos with the word's fingerprint and a fake
+        // opcode index of 42.
+        uint256 itemOffset = META_PREFIX_SIZE + META_EXPANSION_SIZE + expectedPos * META_ITEM_SIZE;
+        meta[itemOffset] = bytes1(uint8(42));
+        meta[itemOffset + 1] = bytes1(uint8((wordFingerprint >> 16) & 0xFF));
+        meta[itemOffset + 2] = bytes1(uint8((wordFingerprint >> 8) & 0xFF));
+        meta[itemOffset + 3] = bytes1(uint8(wordFingerprint & 0xFF));
+    }
     /// Build meta from known words, look them all up, verify indices.
     function testLookupWordKnown() external pure {
         AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](3);

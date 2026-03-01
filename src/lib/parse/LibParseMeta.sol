@@ -101,6 +101,14 @@ library LibParseMeta {
                     }
 
                     (uint256 shifted, uint256 hashed) = wordBitmapped(seed, word);
+
+                    // If the word's bit is not set in the expansion, the word
+                    // is not in the set. No word was mapped to this bit, so
+                    // there is nothing to collide with at any depth.
+                    if (expansion & shifted == 0) {
+                        return (false, 0);
+                    }
+
                     uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativeCt;
                     wordFingerprint = hashed & FINGERPRINT_MASK;
                     uint256 metaItemSize = META_ITEM_SIZE;
