@@ -6,10 +6,24 @@ import {Test} from "forge-std/Test.sol";
 
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibAuthoringMeta, AuthoringMetaV2} from "test/lib/meta/LibAuthoringMeta.sol";
-import {LibGenParseMeta, DuplicateFingerprint, AuthoringMetaTooLarge, MaxDepthExceeded} from "src/lib/codegen/LibGenParseMeta.sol";
+import {
+    LibGenParseMeta,
+    DuplicateFingerprint,
+    AuthoringMetaTooLarge,
+    MaxDepthExceeded,
+    META_ITEM_MASK
+} from "src/lib/codegen/LibGenParseMeta.sol";
+import {META_ITEM_SIZE} from "src/lib/parse/LibParseMeta.sol";
 import {LibBloom} from "test/lib/bloom/LibBloom.sol";
 
 contract LibGenParseMetaBuildMetaTest is Test {
+    /// META_ITEM_MASK must be a full META_ITEM_SIZE-byte mask (32 bits for
+    /// 4-byte items). Previously the constant was (1 << 4) - 1 = 0xF which
+    /// is only 4 bits.
+    function testMetaItemMask() external pure {
+        assertEq(META_ITEM_MASK, (1 << (META_ITEM_SIZE * 8)) - 1);
+        assertEq(META_ITEM_MASK, type(uint32).max);
+    }
     function buildParseMetaV2External(AuthoringMetaV2[] memory authoringMeta, uint8 maxDepth)
         external
         pure

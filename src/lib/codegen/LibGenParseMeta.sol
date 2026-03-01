@@ -14,8 +14,7 @@ import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {Vm} from "forge-std/Vm.sol";
 import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
 
-//forge-lint: disable-next-line(incorrect-shift)
-uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
+uint256 constant META_ITEM_MASK = type(uint32).max;
 
 /// @dev For metadata builder.
 error DuplicateFingerprint();
