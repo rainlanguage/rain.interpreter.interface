@@ -57,7 +57,12 @@ library LibParseMeta {
             // Fingerprint 0 is reserved as the empty-slot sentinel in
             // buildParseMetaV2. If the low 3 bytes are 0, set to 1.
             // This introduces a small bias on fingerprint 1 (2 in 2^24
-            // instead of 1 in 2^24) which is negligible.
+            // instead of 1 in 2^24) which is negligible. Overall collision
+            // probability changes from 1/2^24 to (2^24 + 2)/2^48 which is
+            // effectively identical. The only concrete effect is that two
+            // words which both independently hash to fingerprint 0 (~1 in
+            // 16.7M each) would both map to 1 and appear as a
+            // DuplicateFingerprint during generation — a ~1 in 2^46 event.
             // bitmap is already computed so the high bytes don't matter.
             if iszero(and(hashed, 0xFFFFFF)) { hashed := 1 }
         }
