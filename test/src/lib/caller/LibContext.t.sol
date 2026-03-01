@@ -3,10 +3,24 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibContext, MessageHashUtils, LibHashNoAlloc, SignedContextV1} from "src/lib/caller/LibContext.sol";
+import {
+    LibContext,
+    MessageHashUtils,
+    LibHashNoAlloc,
+    SignedContextV1,
+    InvalidSignature
+} from "src/lib/caller/LibContext.sol";
 import {LibContextSlow} from "./LibContextSlow.sol";
 
 contract LibContextTest is Test {
+    function buildExternal(bytes32[][] memory baseContext, SignedContextV1[] memory signedContexts)
+        external
+        view
+        returns (bytes32[][] memory)
+    {
+        return LibContext.build(baseContext, signedContexts);
+    }
+
     function testBase() public view {
         bytes32[] memory baseContext = LibContext.base();
 
@@ -48,8 +62,116 @@ contract LibContextTest is Test {
         }
     }
 
+    /// Zero signed contexts with empty base: reference must match production.
+    function testBuildStructureZeroSignedEmptyBase() public view {
+        bytes32[][] memory base = new bytes32[][](0);
+        SignedContextV1[] memory signedContexts = new SignedContextV1[](0);
+
+        bytes32[][] memory expected = LibContextSlow.buildStructureSlow(base, signedContexts);
+        bytes32[][] memory actual = LibContext.build(base, signedContexts);
+        assertEq(expected.length, actual.length, "length mismatch");
+
+        for (uint256 i = 0; i < expected.length; i++) {
+            assertEq(expected[i], actual[i]);
+        }
+    }
+
+    /// Zero signed contexts with non-empty base: reference must match
+    /// production. The result should have 1 (base context) + base.length
+    /// columns and no signers column.
+    /// forge-config: default.fuzz.runs = 100
+    function testBuildStructureZeroSignedNonEmptyBase(bytes32[][] memory base) public view {
+        SignedContextV1[] memory signedContexts = new SignedContextV1[](0);
+
+        bytes32[][] memory expected = LibContextSlow.buildStructureSlow(base, signedContexts);
+        bytes32[][] memory actual = LibContext.build(base, signedContexts);
+        assertEq(expected.length, actual.length, "length mismatch");
+        assertEq(actual.length, 1 + base.length, "should be base context + base columns only");
+
+        for (uint256 i = 0; i < expected.length; i++) {
+            assertEq(expected[i], actual[i]);
+        }
+    }
+
+    /// A completely invalid signature should revert with InvalidSignature(0).
+    function testBuildInvalidSignatureReverts() public {
+        bytes32[] memory ctx = new bytes32[](1);
+        ctx[0] = bytes32(uint256(42));
+
+        SignedContextV1[] memory signedContexts = new SignedContextV1[](1);
+        signedContexts[0] = SignedContextV1({
+            signer: address(0xdead),
+            context: ctx,
+            signature: hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        });
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidSignature.selector, uint256(0)));
+        this.buildExternal(new bytes32[][](0), signedContexts);
+    }
+
+    /// First signature valid, second invalid — should revert with
+    /// InvalidSignature(1), not InvalidSignature(0).
+    function testBuildInvalidSignatureSecondIndex() public {
+        // Use vm.sign for a proper first signature.
+        uint256 signerPk = 0xA11CE;
+        address signer = vm.addr(signerPk);
+
+        bytes32[] memory ctx = new bytes32[](1);
+        ctx[0] = bytes32(uint256(1));
+
+        bytes32 digest = MessageHashUtils.toEthSignedMessageHash(LibHashNoAlloc.hashWords(ctx));
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPk, digest);
+        bytes memory validSig = abi.encodePacked(r, s, v);
+
+        SignedContextV1[] memory signedContexts = new SignedContextV1[](2);
+        signedContexts[0] = SignedContextV1({signer: signer, context: ctx, signature: validSig});
+        signedContexts[1] = SignedContextV1({
+            signer: address(0xdead),
+            context: ctx,
+            signature: hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        });
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidSignature.selector, uint256(1)));
+        this.buildExternal(new bytes32[][](0), signedContexts);
+    }
+
+    /// Valid signature but for wrong context data — signer signed different
+    /// data than what is presented.
+    function testBuildInvalidSignatureWrongContext() public {
+        uint256 signerPk = 0xB0B;
+        address signer = vm.addr(signerPk);
+
+        bytes32[] memory signedCtx = new bytes32[](1);
+        signedCtx[0] = bytes32(uint256(1));
+
+        bytes32 digest = MessageHashUtils.toEthSignedMessageHash(LibHashNoAlloc.hashWords(signedCtx));
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPk, digest);
+        bytes memory sig = abi.encodePacked(r, s, v);
+
+        // Present different context than what was signed.
+        bytes32[] memory differentCtx = new bytes32[](1);
+        differentCtx[0] = bytes32(uint256(999));
+
+        SignedContextV1[] memory signedContexts = new SignedContextV1[](1);
+        signedContexts[0] = SignedContextV1({signer: signer, context: differentCtx, signature: sig});
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidSignature.selector, uint256(0)));
+        this.buildExternal(new bytes32[][](0), signedContexts);
+    }
+
+    /// Empty signature bytes should revert.
+    function testBuildInvalidSignatureEmpty() public {
+        bytes32[] memory ctx = new bytes32[](1);
+        ctx[0] = bytes32(uint256(1));
+
+        SignedContextV1[] memory signedContexts = new SignedContextV1[](1);
+        signedContexts[0] = SignedContextV1({signer: address(0xdead), context: ctx, signature: ""});
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidSignature.selector, uint256(0)));
+        this.buildExternal(new bytes32[][](0), signedContexts);
+    }
+
     function testBuild0() public view {
-        // @todo test this better.
         bytes32[][] memory expected = new bytes32[][](1);
         expected[0] = LibContext.base();
         bytes32[][] memory built = LibContext.build(new bytes32[][](0), new SignedContextV1[](0));

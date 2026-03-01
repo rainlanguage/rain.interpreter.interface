@@ -66,6 +66,8 @@ library LibBytecode {
     /// - The number of opcodes specified in the header of each source locates
     ///   the end of the source exactly at either the offset of the next source
     ///   or the end of the bytecode `bytes`.
+    /// Monotonically increasing offsets are implicitly enforced by contiguity:
+    /// each source must end exactly where the next begins.
     //forge-lint: disable-next-line(mixed-case-function)
     function checkNoOOBPointers(bytes memory bytecode) internal pure {
         unchecked {
@@ -288,6 +290,10 @@ library LibBytecode {
     /// Requires allocation and copying so it isn't particularly efficient, but
     /// allows us to use the new bytecode format with old interpreter code. Not
     /// recommended for production code but useful for testing.
+    /// Callers MUST `checkNoOOBPointers` BEFORE calling this function,
+    /// otherwise memory outside the bytecode `bytes` MAY be read.
+    /// @param bytecode The bytecode to convert to legacy source format.
+    /// @return The individual source arrays in legacy format.
     function bytecodeToSources(bytes memory bytecode) internal pure returns (bytes[] memory) {
         unchecked {
             uint256 count = sourceCount(bytecode);

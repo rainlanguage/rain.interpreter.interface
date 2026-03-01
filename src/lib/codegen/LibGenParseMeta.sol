@@ -20,6 +20,10 @@ uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
 /// @dev For metadata builder.
 error DuplicateFingerprint();
 
+/// @dev Thrown when the authoring meta exceeds 256 words. Opcode indices are
+/// stored in a single byte, so more than 256 words cannot be represented.
+error AuthoringMetaTooLarge(uint256 length);
+
 /// @title LibGenParseMeta
 /// @notice Library for building parse meta from authoring meta, and generating
 /// constant strings for the parse meta to be used in generated code. The parse
@@ -54,11 +58,10 @@ library LibGenParseMeta {
         unchecked {
             {
                 uint256 bestCt = 0;
-                for (uint256 seed = 0; seed < type(uint8).max; seed++) {
+                for (uint256 seed = 0; seed <= type(uint8).max; seed++) {
                     uint256 expansion = 0;
                     for (uint256 i = 0; i < metas.length; i++) {
-                        (uint256 shifted, uint256 hashed) = LibParseMeta.wordBitmapped(seed, metas[i].word);
-                        (hashed);
+                        (uint256 shifted,) = LibParseMeta.wordBitmapped(seed, metas[i].word);
                         expansion = shifted | expansion;
                     }
                     uint256 ct = LibCtPop.ctpop(expansion);
@@ -85,8 +88,7 @@ library LibGenParseMeta {
             uint256 usedExpansion = 0;
             uint256 j = 0;
             for (uint256 i = 0; i < metas.length; i++) {
-                (uint256 shifted, uint256 hashed) = LibParseMeta.wordBitmapped(bestSeed, metas[i].word);
-                (hashed);
+                (uint256 shifted,) = LibParseMeta.wordBitmapped(bestSeed, metas[i].word);
                 if ((shifted & usedExpansion) == 0) {
                     usedExpansion = shifted | usedExpansion;
                 } else {
@@ -129,6 +131,11 @@ library LibGenParseMeta {
         returns (bytes memory parseMeta)
     {
         unchecked {
+            // Opcode index is stored in a single byte, so we cannot handle
+            // more than 256 words.
+            if (authoringMeta.length > 256) {
+                revert AuthoringMetaTooLarge(authoringMeta.length);
+            }
             // Write out expansions.
             uint8[] memory seeds;
             uint256[] memory expansions;

@@ -35,7 +35,7 @@ struct EvaluableV4 {
 /// - Provide the context, which can be built in a standard way by `LibContext`
 /// - Handle the stack array returned from `eval4`
 /// - OPTIONALLY emit the `Context` event
-/// - OPTIONALLY set state on the associated `IInterpreterStoreV2`.
+/// - OPTIONALLY set state on the associated `IInterpreterStoreV3`.
 interface IInterpreterCallerV4 {
     /// Calling contracts SHOULD emit `Context` before calling `eval4` if they
     /// are able. Notably `eval4` MAY be called within a static call which means

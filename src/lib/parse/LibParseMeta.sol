@@ -57,9 +57,12 @@ library LibParseMeta {
         }
     }
 
-    /// Given the parse meta and a word, return the index and io fn pointer for
-    /// the word. If the word is not found, then `exists` will be false. The
-    /// caller MUST check `exists` before using the other return values.
+    /// Given the parse meta and a word, return whether the word exists and its
+    /// index. If the word is not found, then `exists` will be false. The caller
+    /// MUST check `exists` before using the other return values.
+    /// The `meta` parameter MUST be well-formed as produced by
+    /// `LibGenParseMeta.buildParseMetaV2`. Behavior is undefined for malformed
+    /// meta — no bounds checking is performed on the meta structure.
     /// @param meta The parser meta.
     /// @param word The word to lookup.
     /// @return True if the word exists in the parse meta.

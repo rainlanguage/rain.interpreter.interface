@@ -11,7 +11,7 @@ interfaces.
 
 Uses nixos.
 
-Install `nix develop` - https://nixos.org/download.html.
+Install Nix - https://nixos.org/download.html.
 
 Run `nix develop` in this repo to drop into the shell. Please ONLY use the nix
 version of `foundry` for development, to ensure versions are all compatible.

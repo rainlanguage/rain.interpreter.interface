@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibHashNoAlloc, HASH_NIL} from "rain.lib.hash/LibHashNoAlloc.sol";
 
 import {SignatureChecker} from "openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
@@ -43,8 +42,6 @@ uint256 constant CONTEXT_BASE_ROW_CALLING_CONTRACT = 1;
 /// closer to compatibility and portability, inheriting network effects of what
 /// has already been authored elsewhere.
 library LibContext {
-    using LibUint256Array for uint256[];
-
     /// The base context is the `msg.sender` and address of the calling contract.
     /// As the interpreter itself is called via an external interface and may be
     /// statically calling itself, it MAY NOT have any ability to inspect either
@@ -163,6 +160,10 @@ library LibContext {
     /// position that would force signed context to be provided in the "correct"
     /// order, rather than relying on the `msg.sender` to honestly present data
     /// in any particular structure/order.
+    /// @return The fully assembled context matrix. Column 0 is the base context
+    /// from `LibContext.base()`. Subsequent columns are from `baseContext`,
+    /// followed by a signers column (each signer address cast to `bytes32`),
+    /// followed by each signed context's data as individual columns.
     function build(bytes32[][] memory baseContext, SignedContextV1[] memory signedContexts)
         internal
         view
