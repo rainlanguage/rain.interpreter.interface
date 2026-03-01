@@ -239,6 +239,8 @@ library LibGenParseMeta {
                     break;
                 }
             }
+
+            LibParseMeta.checkParseMetaStructure(parseMeta);
         }
     }
 
