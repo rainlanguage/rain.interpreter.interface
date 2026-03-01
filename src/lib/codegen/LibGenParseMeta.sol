@@ -111,15 +111,20 @@ library LibGenParseMeta {
     ///   byte is its opcode index, the remaining 3 bytes are the word
     ///   fingerprint.
     /// The parse meta is used to lookup word definitions. To do a lookup, the
-    /// word is hashed with the seed, then the first byte of the hash is compared
-    /// against the bloom filter. If there is a hit then we count the number of
-    /// 1 bits in the bloom filter up to this item's 1 bit. We then treat this
-    /// as the index of the item in the items array. We then compare the word
+    /// word is hashed with the seed, then the first byte of the hash selects a
+    /// bit in the bloom filter. If the bit is not set, the word is not in the
+    /// set — return immediately. If the bit is set, we count the number of 1
+    /// bits in the bloom filter below this item's bit. We then treat this as
+    /// the index of the item in the items array. We then compare the word
     /// fingerprint against the fingerprint of the item at this index. If the
     /// fingerprints equal then we have a match, else we increment the seed and
     /// try again with the next bloom filter, offsetting all the indexes by the
     /// total bit count of the previous bloom filter. If we reach the end of the
     /// bloom filters then we have a miss.
+    /// The output is validated via `LibParseMeta.checkParseMetaStructure`
+    /// before returning. Reverts with `MaxDepthExceeded` if the words cannot
+    /// be compressed within `maxDepth` layers, or `AuthoringMetaTooLarge` if
+    /// there are more than 256 words.
     /// @param authoringMeta The authoring meta to build the parse meta from.
     /// @param maxDepth The maximum depth of the bloom filters to use. This is a
     /// tradeoff between the size of the parse meta and the speed of lookups. The

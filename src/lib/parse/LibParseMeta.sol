@@ -71,14 +71,17 @@ library LibParseMeta {
     /// word. The bitmap is a uint256 with a single bit set, which can be used
     /// to check if the word is present in an expansion. The fingerprint is a
     /// uint256 with the low 3 bytes set, which can be used to check for
-    /// collisions when a word is found in an expansion.
+    /// collisions when a word is found in an expansion. The fingerprint is
+    /// guaranteed to be non-zero (fingerprint 0 is remapped to 1) because
+    /// zero is used as the empty-slot sentinel in `buildParseMetaV2`.
     /// @param seed The seed to use for the bitmap, which should be a byte value
     /// between 0 and 255.
     /// @param word The word to generate the bitmap and fingerprint for.
     /// @return bitmap A uint256 with a single bit set, which can be used to
     /// check if the word is present in an expansion.
-    /// @return hashed A uint256 with the low 3 bytes set, which can be used to
-    /// check for collisions when a word is found in an expansion.
+    /// @return hashed A uint256 with the low 3 bytes guaranteed non-zero,
+    /// which can be used to check for collisions when a word is found in an
+    /// expansion.
     function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256 bitmap, uint256 hashed) {
         assembly ("memory-safe") {
             mstore(0, word)
