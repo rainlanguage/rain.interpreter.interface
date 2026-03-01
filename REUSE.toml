@@ -2,11 +2,14 @@ version = 1
 
 [[annotations]]
 path = [
+    ".coderabbit.yaml",
     ".gas-snapshot",
     ".github/workflows/**/",
     ".gitignore",
     ".gitmodules",
+    "CLAUDE.md",
     "README.md",
+    "audit/**/",
     "flake.lock",
     "flake.nix",
     "foundry.toml",

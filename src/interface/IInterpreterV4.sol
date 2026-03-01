@@ -36,10 +36,27 @@ import {
 } from "./deprecated/v2/IInterpreterV3.sol";
 import {IInterpreterStoreV3} from "./IInterpreterStoreV3.sol";
 
+/// @dev Operand for an opcode in the interpreter. Encoded as `bytes32` to
+/// allow opcode-specific interpretation of the full 32-byte value.
 type OperandV2 is bytes32;
 
+/// @dev A single item on the interpreter stack. Encoded as `bytes32` to hold
+/// arbitrary 32-byte values, including packed Rain decimal floats.
 type StackItem is bytes32;
 
+/// @dev Parameters for a single evaluation of Rainlang bytecode.
+/// @param store The store to read/write state from/to.
+/// @param namespace The fully qualified namespace for state reads during eval.
+/// The interpreter MUST qualify this namespace itself using
+/// `LibNamespace.qualifyNamespace` with `msg.sender`. Implementations MUST NOT
+/// trust caller-provided values as pre-qualified — the type name is descriptive
+/// of the output, not an assertion about the input.
+/// @param bytecode The Rainlang bytecode to evaluate.
+/// @param sourceIndex The index of the source within the bytecode to evaluate.
+/// @param context The context matrix available to the evaluated logic.
+/// @param inputs Pre-populated stack items available to the evaluated logic.
+/// @param stateOverlay State overrides applied before evaluation for "what if"
+/// analysis. Format is implementation-defined (e.g. pairwise key/value).
 struct EvalV4 {
     IInterpreterStoreV3 store;
     FullyQualifiedNamespace namespace;
@@ -92,11 +109,18 @@ interface IInterpreterV4 {
     /// Pass Rainlang bytecode in calldata, and get back the stack and storage
     /// writes.
     ///
+    /// Implementations SHOULD validate bytecode structure (e.g. via
+    /// `LibBytecode.checkNoOOBPointers`) before execution.
+    ///
     /// Key differences in `eval4`:
     /// - Supports state overlays to facilitate "what if" analysis. Each item
     ///   of state in the overlay will override corresponding gets from the store
     ///   unless/until they are set to something else in the evaluated logic.
     /// - Numbers are treated as packed Rain decimal floats, NOT fixed point
     ///   decimals.
+    /// @param eval The eval configuration specifying bytecode, store, namespace,
+    /// context, inputs, and state overlay.
+    /// @return stack The output stack items from evaluating the specified source.
+    /// @return writes Key-value pairs to be applied to the store by the caller.
     function eval4(EvalV4 calldata eval) external view returns (StackItem[] calldata stack, bytes32[] calldata writes);
 }

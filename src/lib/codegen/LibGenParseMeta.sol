@@ -14,11 +14,18 @@ import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {Vm} from "forge-std/Vm.sol";
 import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
 
-//forge-lint: disable-next-line(incorrect-shift)
-uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
+uint256 constant META_ITEM_MASK = type(uint32).max;
 
 /// @dev For metadata builder.
 error DuplicateFingerprint();
+
+/// @dev Thrown when the authoring meta exceeds 256 words. Opcode indices are
+/// stored in a single byte, so more than 256 words cannot be represented.
+error AuthoringMetaTooLarge(uint256 length);
+
+/// @dev Thrown when the authoring meta cannot be compressed within the
+/// provided maxDepth bloom filter layers.
+error MaxDepthExceeded(uint8 maxDepth);
 
 /// @title LibGenParseMeta
 /// @notice Library for building parse meta from authoring meta, and generating
@@ -54,11 +61,11 @@ library LibGenParseMeta {
         unchecked {
             {
                 uint256 bestCt = 0;
-                for (uint256 seed = 0; seed < type(uint8).max; seed++) {
+                for (uint256 seed = 0; seed <= type(uint8).max; seed++) {
                     uint256 expansion = 0;
                     for (uint256 i = 0; i < metas.length; i++) {
-                        (uint256 shifted, uint256 hashed) = LibParseMeta.wordBitmapped(seed, metas[i].word);
-                        (hashed);
+                        //slither-disable-next-line unused-return
+                        (uint256 shifted,) = LibParseMeta.wordBitmapped(seed, metas[i].word);
                         expansion = shifted | expansion;
                     }
                     uint256 ct = LibCtPop.ctpop(expansion);
@@ -85,8 +92,8 @@ library LibGenParseMeta {
             uint256 usedExpansion = 0;
             uint256 j = 0;
             for (uint256 i = 0; i < metas.length; i++) {
-                (uint256 shifted, uint256 hashed) = LibParseMeta.wordBitmapped(bestSeed, metas[i].word);
-                (hashed);
+                //slither-disable-next-line unused-return
+                (uint256 shifted,) = LibParseMeta.wordBitmapped(bestSeed, metas[i].word);
                 if ((shifted & usedExpansion) == 0) {
                     usedExpansion = shifted | usedExpansion;
                 } else {
@@ -106,15 +113,20 @@ library LibGenParseMeta {
     ///   byte is its opcode index, the remaining 3 bytes are the word
     ///   fingerprint.
     /// The parse meta is used to lookup word definitions. To do a lookup, the
-    /// word is hashed with the seed, then the first byte of the hash is compared
-    /// against the bloom filter. If there is a hit then we count the number of
-    /// 1 bits in the bloom filter up to this item's 1 bit. We then treat this
-    /// as the index of the item in the items array. We then compare the word
+    /// word is hashed with the seed, then the first byte of the hash selects a
+    /// bit in the bloom filter. If the bit is not set, the word is not in the
+    /// set — return immediately. If the bit is set, we count the number of 1
+    /// bits in the bloom filter below this item's bit. We then treat this as
+    /// the index of the item in the items array. We then compare the word
     /// fingerprint against the fingerprint of the item at this index. If the
     /// fingerprints equal then we have a match, else we increment the seed and
     /// try again with the next bloom filter, offsetting all the indexes by the
     /// total bit count of the previous bloom filter. If we reach the end of the
     /// bloom filters then we have a miss.
+    /// The output is validated via `LibParseMeta.checkParseMetaStructure`
+    /// before returning. Reverts with `MaxDepthExceeded` if the words cannot
+    /// be compressed within `maxDepth` layers, or `AuthoringMetaTooLarge` if
+    /// there are more than 256 words.
     /// @param authoringMeta The authoring meta to build the parse meta from.
     /// @param maxDepth The maximum depth of the bloom filters to use. This is a
     /// tradeoff between the size of the parse meta and the speed of lookups. The
@@ -129,6 +141,11 @@ library LibGenParseMeta {
         returns (bytes memory parseMeta)
     {
         unchecked {
+            // Opcode index is stored in a single byte, so we cannot handle
+            // more than 256 words.
+            if (authoringMeta.length > 256) {
+                revert AuthoringMetaTooLarge(authoringMeta.length);
+            }
             // Write out expansions.
             uint8[] memory seeds;
             uint256[] memory expansions;
@@ -140,6 +157,9 @@ library LibGenParseMeta {
                 {
                     AuthoringMetaV2[] memory remainingAuthoringMeta = authoringMeta;
                     while (remainingAuthoringMeta.length > 0) {
+                        if (depth >= maxDepth) {
+                            revert MaxDepthExceeded(maxDepth);
+                        }
                         uint8 seed;
                         uint256 expansion;
                         (seed, expansion, remainingAuthoringMeta) = findBestExpander(remainingAuthoringMeta);
@@ -226,6 +246,8 @@ library LibGenParseMeta {
                     break;
                 }
             }
+
+            LibParseMeta.checkParseMetaStructure(parseMeta);
         }
     }
 

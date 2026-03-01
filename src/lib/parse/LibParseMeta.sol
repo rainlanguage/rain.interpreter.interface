@@ -25,23 +25,64 @@ uint256 constant FINGERPRINT_MASK = 0xFFFFFF;
 /// @dev 33 = 32 bytes for expansion + 1 byte for seed
 uint256 constant META_EXPANSION_SIZE = 0x21;
 
+/// @dev Thrown by `checkParseMetaStructure` when the meta bytes do not match
+/// the expected length derived from its depth and expansion data.
+/// @param expected The expected byte length.
+/// @param actual The actual byte length.
+error InvalidParseMeta(uint256 expected, uint256 actual);
+
 /// @title LibParseMeta
 /// @notice Common logic for working with parse meta, which is the data structure
 /// used to store information about the words in a parser. The parse meta is
 /// designed to be compact and efficient to lookup.
 library LibParseMeta {
+    /// Validates that the parse meta has a structurally consistent length.
+    /// Reads the depth and all expansions to compute the expected total byte
+    /// count, then reverts if `meta.length` does not match. Intended to be
+    /// called once at build time so that `lookupWord` can trust the meta
+    /// without per-call bounds checks.
+    /// @param meta The parse meta bytes to validate.
+    function checkParseMetaStructure(bytes memory meta) internal pure {
+        unchecked {
+            uint256 depth;
+            uint256 totalItems = 0;
+            assembly ("memory-safe") {
+                depth := and(mload(add(meta, 1)), 0xFF)
+            }
+            uint256 cursor;
+            assembly ("memory-safe") {
+                cursor := add(meta, 1)
+            }
+            for (uint256 i = 0; i < depth; i++) {
+                uint256 expansion;
+                assembly ("memory-safe") {
+                    cursor := add(cursor, 0x21)
+                    expansion := mload(cursor)
+                }
+                totalItems += LibCtPop.ctpop(expansion);
+            }
+            uint256 expected = META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + totalItems * META_ITEM_SIZE;
+            if (meta.length != expected) {
+                revert InvalidParseMeta(expected, meta.length);
+            }
+        }
+    }
+
     /// @dev Given a word and a seed, return the bitmap and fingerprint for the
     /// word. The bitmap is a uint256 with a single bit set, which can be used
     /// to check if the word is present in an expansion. The fingerprint is a
     /// uint256 with the low 3 bytes set, which can be used to check for
-    /// collisions when a word is found in an expansion.
+    /// collisions when a word is found in an expansion. The fingerprint is
+    /// guaranteed to be non-zero (fingerprint 0 is remapped to 1) because
+    /// zero is used as the empty-slot sentinel in `buildParseMetaV2`.
     /// @param seed The seed to use for the bitmap, which should be a byte value
     /// between 0 and 255.
     /// @param word The word to generate the bitmap and fingerprint for.
     /// @return bitmap A uint256 with a single bit set, which can be used to
     /// check if the word is present in an expansion.
-    /// @return hashed A uint256 with the low 3 bytes set, which can be used to
-    /// check for collisions when a word is found in an expansion.
+    /// @return hashed A uint256 with the low 3 bytes guaranteed non-zero,
+    /// which can be used to check for collisions when a word is found in an
+    /// expansion.
     function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256 bitmap, uint256 hashed) {
         assembly ("memory-safe") {
             mstore(0, word)
@@ -54,12 +95,27 @@ library LibParseMeta {
             // low 3 bytes for the fingerprint.
             //slither-disable-next-line incorrect-shift
             bitmap := shl(byte(0, hashed), 1)
+            // Fingerprint 0 is reserved as the empty-slot sentinel in
+            // buildParseMetaV2. If the low 3 bytes are 0, set to 1.
+            // This introduces a small bias on fingerprint 1 (2 in 2^24
+            // instead of 1 in 2^24) which is negligible. Overall collision
+            // probability changes from 1/2^24 to (2^24 + 2)/2^48 which is
+            // effectively identical. The only concrete effect is that two
+            // words which both independently hash to fingerprint 0 (~1 in
+            // 16.7M each) would both map to 1 and appear as a
+            // DuplicateFingerprint during generation — a ~1 in 2^46 event.
+            // bitmap is already computed so the high bytes don't matter.
+            if iszero(and(hashed, 0xFFFFFF)) { hashed := 1 }
         }
     }
 
-    /// Given the parse meta and a word, return the index and io fn pointer for
-    /// the word. If the word is not found, then `exists` will be false. The
-    /// caller MUST check `exists` before using the other return values.
+    /// Given the parse meta and a word, return whether the word exists and its
+    /// index. If the word is not found, then `exists` will be false. The caller
+    /// MUST check `exists` before using the other return values.
+    /// The `meta` parameter MUST be well-formed as produced by
+    /// `LibGenParseMeta.buildParseMetaV2`. Behavior is undefined for malformed
+    /// meta — no bounds checking is performed on the meta structure. Use
+    /// `checkParseMetaStructure` to validate meta at build time.
     /// @param meta The parser meta.
     /// @param word The word to lookup.
     /// @return True if the word exists in the parse meta.
@@ -98,6 +154,14 @@ library LibParseMeta {
                     }
 
                     (uint256 shifted, uint256 hashed) = wordBitmapped(seed, word);
+
+                    // If the word's bit is not set in the expansion, the word
+                    // is not in the set. No word was mapped to this bit, so
+                    // there is nothing to collide with at any depth.
+                    if (expansion & shifted == 0) {
+                        return (false, 0);
+                    }
+
                     uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativeCt;
                     wordFingerprint = hashed & FINGERPRINT_MASK;
                     uint256 metaItemSize = META_ITEM_SIZE;

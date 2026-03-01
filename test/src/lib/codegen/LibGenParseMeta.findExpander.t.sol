@@ -8,6 +8,7 @@ import {LibBloom} from "test/lib/bloom/LibBloom.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibAuthoringMeta, AuthoringMetaV2} from "test/lib/meta/LibAuthoringMeta.sol";
 import {LibGenParseMeta} from "src/lib/codegen/LibGenParseMeta.sol";
+import {LibGenParseMetaSlow} from "test/src/lib/codegen/LibGenParseMetaSlow.sol";
 
 /// @title LibGenParseMetaFindExpanderTest
 /// Test that we can find reasonable expansions in a reasonable number of
@@ -30,5 +31,59 @@ contract LibGenParseMetaFindExpanderTest is Test {
         (seed);
         assertEq(LibCtPop.ctpop(expansion), authoringMeta.length);
         assertEq(remaining.length, 0);
+    }
+
+    /// Empty input should return bestSeed 0, empty expansion, empty remaining.
+    function testFindExpanderEmpty() external pure {
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](0);
+        (uint8 bestSeed, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) =
+            LibGenParseMeta.findBestExpander(metas);
+        assertEq(bestSeed, 0);
+        assertEq(bestExpansion, 0);
+        assertEq(remaining.length, 0);
+    }
+
+    /// Large input (64 elements) forces non-empty remaining array due to
+    /// bloom filter collisions.
+    function testFindExpanderLarge() external pure {
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](64);
+        for (uint256 i = 0; i < 64; i++) {
+            metas[i] = AuthoringMetaV2({word: bytes32(i), description: ""});
+        }
+        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) = LibGenParseMeta.findBestExpander(metas);
+        uint256 expandedCount = LibCtPop.ctpop(bestExpansion);
+        assertEq(remaining.length, 64 - expandedCount);
+    }
+
+    /// Single word should always get a perfect expansion with no remaining.
+    function testFindExpanderSingleWord(bytes32 word) external pure {
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](1);
+        metas[0] = AuthoringMetaV2({word: word, description: ""});
+        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) = LibGenParseMeta.findBestExpander(metas);
+        assertEq(LibCtPop.ctpop(bestExpansion), 1);
+        assertEq(remaining.length, 0);
+    }
+
+    /// Fuzz: the invariant expandedCount + remaining.length == metas.length
+    /// must always hold.
+    function testFindExpanderInvariant(AuthoringMetaV2[] memory authoringMeta) external pure {
+        vm.assume(!LibBloom.bloomFindsDupes(LibAuthoringMeta.copyWordsFromAuthoringMeta(authoringMeta)));
+        (, uint256 bestExpansion, AuthoringMetaV2[] memory remaining) = LibGenParseMeta.findBestExpander(authoringMeta);
+        uint256 expandedCount = LibCtPop.ctpop(bestExpansion);
+        assertEq(expandedCount + remaining.length, authoringMeta.length);
+    }
+
+    /// Fuzz: findBestExpander must agree with the reference implementation
+    /// that searches all 256 seeds.
+    function testFindExpanderMatchesReference(AuthoringMetaV2[] memory authoringMeta) external pure {
+        vm.assume(authoringMeta.length > 0);
+        vm.assume(authoringMeta.length <= 0x20);
+        vm.assume(!LibBloom.bloomFindsDupes(LibAuthoringMeta.copyWordsFromAuthoringMeta(authoringMeta)));
+
+        (uint8 refBestSeed, uint256 refBestCt) = LibGenParseMetaSlow.findBestExpanderSlow(authoringMeta);
+
+        (uint8 bestSeed, uint256 bestExpansion,) = LibGenParseMeta.findBestExpander(authoringMeta);
+        assertEq(bestSeed, refBestSeed, "seed mismatch");
+        assertEq(LibCtPop.ctpop(bestExpansion), refBestCt, "expansion count mismatch");
     }
 }
