@@ -54,6 +54,12 @@ library LibParseMeta {
             // low 3 bytes for the fingerprint.
             //slither-disable-next-line incorrect-shift
             bitmap := shl(byte(0, hashed), 1)
+            // Fingerprint 0 is reserved as the empty-slot sentinel in
+            // buildParseMetaV2. If the low 3 bytes are 0, set to 1.
+            // This introduces a small bias on fingerprint 1 (2 in 2^24
+            // instead of 1 in 2^24) which is negligible.
+            // bitmap is already computed so the high bytes don't matter.
+            if iszero(and(hashed, 0xFFFFFF)) { hashed := 1 }
         }
     }
 
