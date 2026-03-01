@@ -6,7 +6,7 @@ import {Test} from "forge-std/Test.sol";
 
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibAuthoringMeta, AuthoringMetaV2} from "test/lib/meta/LibAuthoringMeta.sol";
-import {LibGenParseMeta, DuplicateFingerprint, AuthoringMetaTooLarge} from "src/lib/codegen/LibGenParseMeta.sol";
+import {LibGenParseMeta, DuplicateFingerprint, AuthoringMetaTooLarge, MaxDepthExceeded} from "src/lib/codegen/LibGenParseMeta.sol";
 import {LibBloom} from "test/lib/bloom/LibBloom.sol";
 
 contract LibGenParseMetaBuildMetaTest is Test {
@@ -107,6 +107,33 @@ contract LibGenParseMetaBuildMetaTest is Test {
         }
         vm.expectRevert(abi.encodeWithSelector(AuthoringMetaTooLarge.selector, length));
         this.buildParseMetaV2External(metas, 8);
+    }
+
+    /// maxDepth=1 with enough words to force multiple bloom layers should
+    /// revert with MaxDepthExceeded.
+    function testBuildMetaMaxDepthExceeded() external {
+        // 256 unique words will need more than 1 bloom layer.
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](256);
+        for (uint256 i = 0; i < 256; i++) {
+            metas[i] = AuthoringMetaV2({word: bytes32(i), description: ""});
+        }
+        vm.expectRevert(abi.encodeWithSelector(MaxDepthExceeded.selector, 1));
+        this.buildParseMetaV2External(metas, 1);
+    }
+
+    /// Fuzz: maxDepth=1 with more than 1 word that collides should revert.
+    /// Even 2 words can collide at depth 1 if they share a bit position for
+    /// every seed — but with 256+ words, collision is guaranteed.
+    function testBuildMetaMaxDepthExceededFuzz(uint8 maxDepth) external {
+        // Use enough words that the required depth exceeds maxDepth.
+        // 256 words need at least 2 layers; bound maxDepth to 1.
+        vm.assume(maxDepth < 2);
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](256);
+        for (uint256 i = 0; i < 256; i++) {
+            metas[i] = AuthoringMetaV2({word: bytes32(i), description: ""});
+        }
+        vm.expectRevert(abi.encodeWithSelector(MaxDepthExceeded.selector, maxDepth));
+        this.buildParseMetaV2External(metas, maxDepth);
     }
 
     /// Exactly 256 words should succeed (boundary).

@@ -24,6 +24,10 @@ error DuplicateFingerprint();
 /// stored in a single byte, so more than 256 words cannot be represented.
 error AuthoringMetaTooLarge(uint256 length);
 
+/// @dev Thrown when the authoring meta cannot be compressed within the
+/// provided maxDepth bloom filter layers.
+error MaxDepthExceeded(uint8 maxDepth);
+
 /// @title LibGenParseMeta
 /// @notice Library for building parse meta from authoring meta, and generating
 /// constant strings for the parse meta to be used in generated code. The parse
@@ -147,6 +151,9 @@ library LibGenParseMeta {
                 {
                     AuthoringMetaV2[] memory remainingAuthoringMeta = authoringMeta;
                     while (remainingAuthoringMeta.length > 0) {
+                        if (depth >= maxDepth) {
+                            revert MaxDepthExceeded(maxDepth);
+                        }
                         uint8 seed;
                         uint256 expansion;
                         (seed, expansion, remainingAuthoringMeta) = findBestExpander(remainingAuthoringMeta);
