@@ -19,7 +19,8 @@ type ExternDispatchV2 is bytes32;
 /// The difference between V3 and V4 is that V4 uses the `bytes32` type rather
 /// than `uint256` for better binary/numeric clarity.
 interface IInterpreterExternV4 {
-    /// Checks the integrity of some extern call.
+    /// Checks the integrity of some extern call. Called during parsing/bytecode
+    /// building, NOT at eval runtime.
     /// @param dispatch Encoded information about the extern to dispatch.
     /// Analogous to the opcode/operand in the interpreter.
     /// @param expectedInputs The number of inputs expected for the dispatched

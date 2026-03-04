@@ -19,9 +19,11 @@ import {
 
 //forge-lint: disable-end
 
-/// @param interpreter Will evaluate the expression.
+/// @param interpreter Will evaluate the expression. Callers MUST NOT use an
+/// `EvaluableV4` with a zero or untrusted interpreter address.
 /// @param store Will store state changes due to evaluation of the expression.
-/// @param expression Will be evaluated by the interpreter.
+/// MAY be `address(0)` only if the expression never writes state.
+/// @param bytecode Will be evaluated by the interpreter.
 struct EvaluableV4 {
     IInterpreterV4 interpreter;
     IInterpreterStoreV3 store;

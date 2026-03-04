@@ -9,7 +9,7 @@ interfaces.
 
 ### Local environment & CI
 
-Uses nixos.
+Uses Nix.
 
 Install Nix - https://nixos.org/download.html.
 

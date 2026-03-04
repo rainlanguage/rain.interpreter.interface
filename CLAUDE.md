@@ -24,7 +24,7 @@ Compiler: Solidity 0.8.25, EVM target: cancun, optimizer enabled (1M runs). Fuzz
 
 All reverts use custom errors — no `revert("string")` or `require()` with string messages.
 
-Interfaces use `pragma solidity ^0.8.18` for downstream compatibility; libraries and errors use `^0.8.25`.
+Interfaces use `pragma solidity ^0.8.25`; libraries and errors use `^0.8.25`.
 
 ## Architecture
 

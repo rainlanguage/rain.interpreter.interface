@@ -185,6 +185,13 @@ library LibGenParseMeta {
                 }
 
                 {
+                    // dataStart is set so that mload(dataStart + pos * META_ITEM_SIZE)
+                    // places the 4-byte item at bytes 28–31 of the loaded word,
+                    // matching the byte(28, ...) extraction in lookupWord.
+                    // This works because the offset omits the 0x20 bytes-length
+                    // prefix and adds META_ITEM_SIZE instead, creating a 28-byte
+                    // backset (0x20 - META_ITEM_SIZE = 28) from the first item's
+                    // actual memory address.
                     uint256 dataOffset = META_PREFIX_SIZE + META_ITEM_SIZE + depth * META_EXPANSION_SIZE;
                     assembly ("memory-safe") {
                         dataStart := add(parseMeta, dataOffset)

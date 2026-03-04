@@ -51,7 +51,7 @@ contract LibParseMetaLookupWordTest is Test {
         for (uint256 i = 0; i < truncated.length; i++) {
             truncated[i] = meta[i];
         }
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidParseMeta.selector, meta.length, truncated.length));
         this.checkParseMetaStructureExternal(truncated);
     }
 
@@ -66,7 +66,7 @@ contract LibParseMetaLookupWordTest is Test {
         for (uint256 i = 0; i < meta.length; i++) {
             extended[i] = meta[i];
         }
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidParseMeta.selector, meta.length, extended.length));
         this.checkParseMetaStructureExternal(extended);
     }
 
@@ -74,7 +74,7 @@ contract LibParseMetaLookupWordTest is Test {
     function testCheckParseMetaStructureEmpty() external {
         bytes memory meta = new bytes(0);
         // depth=0, 0 expansions, 0 items → expected length = 1.
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidParseMeta.selector, META_PREFIX_SIZE, 0));
         this.checkParseMetaStructureExternal(meta);
     }
 

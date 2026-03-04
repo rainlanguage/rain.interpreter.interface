@@ -41,6 +41,30 @@ contract LibBytecodeBytecodeToSourcesTest is BytecodeTest {
         assertEq(uint8(sources[0][3]), 0x12);
     }
 
+    /// Single source with multiple opcodes. Verify every opcode is shuffled.
+    function testBytecodeToSourcesOneSourceMultipleOps() external pure {
+        // 1 source, offset 0, header: 3 ops, 3 alloc, 0 inputs, 3 outputs
+        // opcodes: [AA,BB,CC,DD] [11,22,33,44] [FF,EE,DD,CC]
+        bytes[] memory sources = LibBytecode.bytecodeToSources(hex"01000003030003AABBCCDD11223344FFEEDDCC");
+        assertEq(sources.length, 1);
+        assertEq(sources[0].length, 12);
+        // Op 0: 0xAA moves to byte 1, byte 0 becomes 0.
+        assertEq(uint8(sources[0][0]), 0x00);
+        assertEq(uint8(sources[0][1]), 0xAA);
+        assertEq(uint8(sources[0][2]), 0xCC);
+        assertEq(uint8(sources[0][3]), 0xDD);
+        // Op 1: 0x11 moves to byte 1, byte 0 becomes 0.
+        assertEq(uint8(sources[0][4]), 0x00);
+        assertEq(uint8(sources[0][5]), 0x11);
+        assertEq(uint8(sources[0][6]), 0x33);
+        assertEq(uint8(sources[0][7]), 0x44);
+        // Op 2: 0xFF moves to byte 1, byte 0 becomes 0.
+        assertEq(uint8(sources[0][8]), 0x00);
+        assertEq(uint8(sources[0][9]), 0xFF);
+        assertEq(uint8(sources[0][10]), 0xDD);
+        assertEq(uint8(sources[0][11]), 0xCC);
+    }
+
     /// Multiple sources with varying op counts.
     function testBytecodeToSourcesMultipleSources() external pure {
         // 2 sources
