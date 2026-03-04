@@ -7,6 +7,29 @@ import {LibBytecode, SourceIndexOutOfBounds} from "src/lib/bytecode/LibBytecode.
 import {LibBytecodeSlow} from "test/src/lib/bytecode/LibBytecodeSlow.sol";
 
 contract LibBytecodeSourceInputsOutputsTest is BytecodeTest {
+    /// Concrete value-pinning tests for sourceInputsOutputsLength.
+    function testSourceInputsOutputsConcrete() external pure {
+        // 1 source, 0 ops, alloc=0, inputs=0, outputs=0.
+        (uint256 i0, uint256 o0) = LibBytecode.sourceInputsOutputsLength(hex"01000000000000", 0);
+        assertEq(i0, 0);
+        assertEq(o0, 0);
+        // 1 source, 0 ops, alloc=5, inputs=2, outputs=3.
+        (uint256 i1, uint256 o1) = LibBytecode.sourceInputsOutputsLength(hex"01000000050203", 0);
+        assertEq(i1, 2);
+        assertEq(o1, 3);
+        // 1 source, 0 ops, alloc=0xFF, inputs=0xFF, outputs=0xFF.
+        (uint256 i2, uint256 o2) = LibBytecode.sourceInputsOutputsLength(hex"010000_00ffffff", 0);
+        assertEq(i2, 0xFF);
+        assertEq(o2, 0xFF);
+        // 2 sources: source 0 inputs=1,outputs=2; source 1 inputs=3,outputs=4.
+        (uint256 i3, uint256 o3) = LibBytecode.sourceInputsOutputsLength(hex"02_0000_0004_00030102_00070304", 0);
+        assertEq(i3, 1);
+        assertEq(o3, 2);
+        (uint256 i4, uint256 o4) = LibBytecode.sourceInputsOutputsLength(hex"02_0000_0004_00030102_00070304", 1);
+        assertEq(i4, 3);
+        assertEq(o4, 4);
+    }
+
     function sourceInputsOutputsExternal(bytes memory bytecode, uint256 sourceIndex)
         external
         pure

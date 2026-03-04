@@ -25,6 +25,14 @@ contract LibGenParseMetaBuildMetaTest is Test {
         assertEq(META_ITEM_MASK, type(uint32).max);
     }
 
+    /// Zero words should produce a 1-byte meta (just the depth prefix = 0).
+    function testBuildParseMetaV2ZeroWords() external pure {
+        AuthoringMetaV2[] memory metas = new AuthoringMetaV2[](0);
+        bytes memory meta = LibGenParseMeta.buildParseMetaV2(metas, 8);
+        assertEq(meta.length, 1);
+        assertEq(uint8(meta[0]), 0);
+    }
+
     function buildParseMetaV2External(AuthoringMetaV2[] memory authoringMeta, uint8 maxDepth)
         external
         pure

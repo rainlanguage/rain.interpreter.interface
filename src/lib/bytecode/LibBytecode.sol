@@ -68,6 +68,7 @@ library LibBytecode {
     ///   or the end of the bytecode `bytes`.
     /// Monotonically increasing offsets are implicitly enforced by contiguity:
     /// each source must end exactly where the next begins.
+    /// @param bytecode The bytecode to validate.
     //forge-lint: disable-next-line(mixed-case-function)
     function checkNoOOBPointers(bytes memory bytecode) internal pure {
         unchecked {

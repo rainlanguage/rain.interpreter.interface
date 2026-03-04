@@ -72,7 +72,7 @@ library LibContext {
     /// single `SignedContextV1` in isolation. Avoids allocating memory by
     /// hashing each struct field in sequence within the memory scratch space.
     /// @param signedContext The signed context to hash.
-    /// @param hashed The hashed signed context.
+    /// @return hashed The hashed signed context.
     function hash(SignedContextV1 memory signedContext) internal pure returns (bytes32 hashed) {
         uint256 signerOffset = SIGNED_CONTEXT_SIGNER_OFFSET;
         uint256 contextOffset = SIGNED_CONTEXT_CONTEXT_OFFSET;
@@ -153,7 +153,7 @@ library LibContext {
     /// authentic. The builder WILL REVERT if any of the signatures are invalid.
     /// Note two things about the structure of the final built context re: signed
     /// contexts:
-    /// - The first column is a list of the signers in order of what they signed
+    /// - The first signed column is a list of the signers in order of what they signed
     /// - The `msg.sender` can provide an arbitrary number of signed contexts so
     ///   expressions DO NOT know exactly how many columns there are.
     /// The expression is responsible for defining e.g. a domain separator in a

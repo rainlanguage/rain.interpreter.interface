@@ -57,6 +57,8 @@ type StackItem is bytes32;
 /// @param inputs Pre-populated stack items available to the evaluated logic.
 /// @param stateOverlay State overrides applied before evaluation for "what if"
 /// analysis. Format is implementation-defined (e.g. pairwise key/value).
+/// WARNING: Callers that pass a non-empty overlay and then apply the resulting
+/// `writes` to the store may produce unexpected state.
 struct EvalV4 {
     IInterpreterStoreV3 store;
     FullyQualifiedNamespace namespace;
@@ -68,7 +70,7 @@ struct EvalV4 {
 }
 
 /// @title IInterpreterV4
-/// Interface into a standard interpreter that supports:
+/// @notice Interface into a standard interpreter that supports:
 ///
 /// - evaluating Rainlang logic provided as rain bytecode in calldata
 /// - receiving arbitrary `bytes32[][]` supporting context to be made available

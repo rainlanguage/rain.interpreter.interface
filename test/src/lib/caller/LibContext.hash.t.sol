@@ -30,6 +30,13 @@ contract LibContextHashTest is Test {
         }
     }
 
+    /// Concrete test: hash of SignedContextV1 with empty context and signature
+    /// matches reference implementation.
+    function testSignedContextHashEmpty() public pure {
+        SignedContextV1 memory ctx = SignedContextV1(address(0), new bytes32[](0), "");
+        assertEq(LibContext.hash(ctx), LibContextSlow.hashSlow(ctx));
+    }
+
     /// forge-config: default.fuzz.runs = 100
     function testSignedContextHashReferenceImplementation(SignedContextV1 memory signedContext) public pure {
         assertEq(LibContext.hash(signedContext), LibContextSlow.hashSlow(signedContext));

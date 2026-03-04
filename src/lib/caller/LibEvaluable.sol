@@ -9,6 +9,10 @@ import {IInterpreterStoreV3} from "../../interface/IInterpreterStoreV3.sol";
 
 import {EvaluableV4} from "../../interface/IInterpreterCallerV4.sol";
 
+// Number of fixed-size fields (interpreter, store) in `EvaluableV4` before
+// the dynamic `bytecode` pointer. 2 fields * 0x20 bytes each = 0x40.
+uint256 constant EVALUABLE_V4_FIXED_FIELDS_SIZE = 0x40;
+
 /// @title LibEvaluable
 /// @notice Common logic to provide consistent implementations of common tasks
 /// that could be arbitrarily/ambiguously implemented, but work much better if
@@ -24,8 +28,8 @@ library LibEvaluable {
         bytes memory bytecode = evaluable.bytecode;
         bytes32 evaluableHash;
         assembly ("memory-safe") {
-            // Hash first fields of evaluable.
-            mstore(0, keccak256(evaluable, 0x40))
+            // Hash first fields of evaluable (interpreter + store).
+            mstore(0, keccak256(evaluable, EVALUABLE_V4_FIXED_FIELDS_SIZE))
             // Hash bytecode.
             mstore(0x20, keccak256(add(bytecode, 0x20), mload(bytecode)))
 

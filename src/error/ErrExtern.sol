@@ -3,6 +3,7 @@
 pragma solidity ^0.8.25;
 
 /// Thrown when the extern interface is not supported.
+/// @param extern The address that does not implement the extern interface.
 error NotAnExternContract(address extern);
 
 /// Thrown by the extern contract at runtime when the inputs don't match the
