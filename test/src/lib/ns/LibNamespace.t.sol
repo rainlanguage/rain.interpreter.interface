@@ -12,16 +12,12 @@ contract LibNamespaceTest is Test {
     function testQualifyNamespaceConcrete() public pure {
         // qualifyNamespace(0, address(0)) == keccak256(abi.encode(0, 0)).
         assertEq(
-            FullyQualifiedNamespace.unwrap(
-                LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(0))
-            ),
+            FullyQualifiedNamespace.unwrap(LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(0))),
             uint256(keccak256(abi.encode(uint256(0), uint256(0))))
         );
         // Non-zero inputs.
         assertEq(
-            FullyQualifiedNamespace.unwrap(
-                LibNamespace.qualifyNamespace(StateNamespace.wrap(1), address(0xdead))
-            ),
+            FullyQualifiedNamespace.unwrap(LibNamespace.qualifyNamespace(StateNamespace.wrap(1), address(0xdead))),
             uint256(keccak256(abi.encode(uint256(1), uint256(uint160(address(0xdead))))))
         );
     }

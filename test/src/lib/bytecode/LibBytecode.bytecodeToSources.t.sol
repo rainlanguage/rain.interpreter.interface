@@ -45,7 +45,7 @@ contract LibBytecodeBytecodeToSourcesTest is BytecodeTest {
     function testBytecodeToSourcesOneSourceMultipleOps() external pure {
         // 1 source, offset 0, header: 3 ops, 3 alloc, 0 inputs, 3 outputs
         // opcodes: [AA,BB,CC,DD] [11,22,33,44] [FF,EE,DD,CC]
-        bytes[] memory sources = LibBytecode.bytecodeToSources(hex"010000_03030003_AABBCCDD_11223344_FFEEDDCC");
+        bytes[] memory sources = LibBytecode.bytecodeToSources(hex"01000003030003AABBCCDD11223344FFEEDDCC");
         assertEq(sources.length, 1);
         assertEq(sources[0].length, 12);
         // Op 0: 0xAA moves to byte 1, byte 0 becomes 0.
