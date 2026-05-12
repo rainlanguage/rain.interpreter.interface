@@ -20,9 +20,19 @@ evm_version = "cancun"
 bytecode_hash = "none"
 cbor_metadata = false
 
-remappings = [
-    "rain.sol.codegen/=lib/rain.sol.codegen/src/",
-]
+libs = ["dependencies"]
 
 [fuzz]
 runs = 2048
+
+[dependencies]
+forge-std = "1.16.1"
+"@openzeppelin-contracts" = "5.6.1"
+"rain-lib-hash" = "0.1.0"
+"rain-lib-typecast" = "0.1.0"
+"rain-math-binary" = "0.1.1"
+"rain-sol-codegen" = "0.1.0"
+"rain-solmem" = "0.1.3"
+
+[soldeer]
+recursive_deps = false
