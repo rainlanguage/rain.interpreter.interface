@@ -10,9 +10,9 @@ import {
     META_PREFIX_SIZE,
     LibParseMeta
 } from "../parse/LibParseMeta.sol";
-import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
-import {Vm} from "forge-std/Vm.sol";
-import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
+import {LibCtPop} from "rain-math-binary-0.1.1/src/lib/LibCtPop.sol";
+import {Vm} from "forge-std-1.16.1/src/Vm.sol";
+import {LibCodeGen} from "rain-sol-codegen-0.1.0/src/lib/LibCodeGen.sol";
 
 uint256 constant META_ITEM_MASK = type(uint32).max;
 

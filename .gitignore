@@ -2,3 +2,7 @@ cache
 out
 .fixes
 .DS_Store
+.env
+dependencies
+remappings.txt
+.pre-commit-config.yaml
