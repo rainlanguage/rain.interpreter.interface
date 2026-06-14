@@ -243,6 +243,119 @@ contract LibParseMetaLookupWordTest is Test {
         assertFalse(notExists, "unknown word should not exist");
     }
 
+    /// Writes a 4-byte item (opcode index + 3 byte fingerprint) into `meta` at
+    /// the item slot `itemIndex`, which is offset past the prefix byte and all
+    /// `depth` expansion blocks.
+    function _writeMetaItem(bytes memory meta, uint256 depth, uint256 itemIndex, uint8 opcodeIndex, uint256 fingerprint)
+        internal
+        pure
+    {
+        uint256 itemOffset = META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + itemIndex * META_ITEM_SIZE;
+        meta[itemOffset] = bytes1(opcodeIndex);
+        meta[itemOffset + 1] = bytes1(uint8((fingerprint >> 16) & 0xFF));
+        meta[itemOffset + 2] = bytes1(uint8((fingerprint >> 8) & 0xFF));
+        meta[itemOffset + 3] = bytes1(uint8(fingerprint & 0xFF));
+    }
+
+    /// Writes a depth byte, then for each of `depth` layers a seed byte
+    /// immediately followed by its 32 byte expansion.
+    function _writeMetaExpansions(bytes memory meta, uint8[] memory seeds, uint256[] memory expansions) internal pure {
+        meta[0] = bytes1(uint8(seeds.length));
+        for (uint256 d = 0; d < seeds.length; d++) {
+            uint256 layerOffset = META_PREFIX_SIZE + d * META_EXPANSION_SIZE;
+            meta[layerOffset] = bytes1(seeds[d]);
+            for (uint256 i = 0; i < 32; i++) {
+                meta[layerOffset + 1 + i] = bytes1(uint8((expansions[d] >> (8 * (31 - i))) & 0xFF));
+            }
+        }
+    }
+
+    /// A word whose bit is set at depth 0 but whose fingerprint does not match
+    /// the item there must descend to the next bloom layer. The descent offsets
+    /// the item index by the number of set bits in every prior expansion, so a
+    /// match at depth 1 returns the item from the second layer's item block.
+    ///
+    /// Crafted meta with two layers, each holding a single set bit:
+    /// - depth 0: the word's bit is set, but its item carries a foreign
+    ///   fingerprint, so the fingerprint comparison fails.
+    /// - depth 1: the word's bit is set, and its item carries the word's
+    ///   fingerprint plus opcode index 7. lookupWord computes pos 0 within the
+    ///   layer and adds cumulativeCt 1 (one bit set at depth 0), so it reads
+    ///   item slot 1 and returns (true, 7).
+    function testLookupWordCollisionDescent() external pure {
+        bytes32 word = bytes32("descend");
+        bytes memory meta = new bytes(META_PREFIX_SIZE + 2 * META_EXPANSION_SIZE + 2 * META_ITEM_SIZE);
+
+        {
+            uint8[] memory seeds = new uint8[](2);
+            seeds[0] = 1;
+            seeds[1] = 2;
+            uint256[] memory expansions = new uint256[](2);
+            uint256 hashed0;
+            uint256 hashed1;
+            {
+                uint256 shifted0;
+                uint256 shifted1;
+                (shifted0, hashed0) = LibParseMeta.wordBitmapped(seeds[0], word);
+                (shifted1, hashed1) = LibParseMeta.wordBitmapped(seeds[1], word);
+                // The seeds are chosen so the word lands on different bits per
+                // layer; assert it so the crafted indices below hold.
+                assertTrue(shifted0 != shifted1, "seeds must place word on distinct bits");
+                // Each layer sets exactly the word's bit, so ctpop is 1 per
+                // layer.
+                expansions[0] = shifted0;
+                expansions[1] = shifted1;
+            }
+            _writeMetaExpansions(meta, seeds, expansions);
+
+            // Depth 0 item: a foreign fingerprint so the comparison fails.
+            // Derived from the word's own fingerprint so it can never match.
+            _writeMetaItem(meta, 2, 0, 99, ((hashed0 & FINGERPRINT_MASK) ^ 0x000001) & FINGERPRINT_MASK);
+            // Depth 1 item: the word's fingerprint and the real opcode index 7.
+            _writeMetaItem(meta, 2, 1, 7, hashed1 & FINGERPRINT_MASK);
+        }
+
+        // pos at depth 0 is 0; cumulativeCt becomes ctpop(expansion0) = 1 after
+        // the fingerprint miss; pos at depth 1 is 0 + 1 = 1.
+        (bool exists, uint256 index) = LibParseMeta.lookupWord(meta, word);
+        assertTrue(exists, "word resolved after descending past the depth 0 miss");
+        assertEq(index, 7, "index comes from the depth 1 item slot at offset 1");
+    }
+
+    /// A word whose bit is set at every depth but whose fingerprint never
+    /// matches must miss once the loop runs past the last layer. The descent
+    /// visits both layers and the post-loop return yields (false, 0).
+    function testLookupWordDescendThenMiss() external pure {
+        bytes32 word = bytes32("nomatch");
+        bytes memory meta = new bytes(META_PREFIX_SIZE + 2 * META_EXPANSION_SIZE + 2 * META_ITEM_SIZE);
+
+        {
+            uint8[] memory seeds = new uint8[](2);
+            seeds[0] = 3;
+            seeds[1] = 4;
+            uint256[] memory expansions = new uint256[](2);
+            uint256 hashed0;
+            uint256 hashed1;
+            {
+                uint256 shifted0;
+                uint256 shifted1;
+                (shifted0, hashed0) = LibParseMeta.wordBitmapped(seeds[0], word);
+                (shifted1, hashed1) = LibParseMeta.wordBitmapped(seeds[1], word);
+                expansions[0] = shifted0;
+                expansions[1] = shifted1;
+            }
+            _writeMetaExpansions(meta, seeds, expansions);
+
+            // Both item slots carry foreign fingerprints, so neither matches.
+            _writeMetaItem(meta, 2, 0, 11, ((hashed0 & FINGERPRINT_MASK) ^ 0x000001) & FINGERPRINT_MASK);
+            _writeMetaItem(meta, 2, 1, 22, ((hashed1 & FINGERPRINT_MASK) ^ 0x000001) & FINGERPRINT_MASK);
+        }
+
+        (bool exists, uint256 index) = LibParseMeta.lookupWord(meta, word);
+        assertFalse(exists, "bit set at every depth but no fingerprint matched");
+        assertEq(index, 0, "miss returns index 0");
+    }
+
     /// Larger word set forcing multi-depth bloom — verify all words still
     /// resolve correctly.
     function testLookupWordLargeSet() external pure {
