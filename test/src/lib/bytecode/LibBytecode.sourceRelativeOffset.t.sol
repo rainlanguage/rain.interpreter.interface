@@ -77,4 +77,34 @@ contract LibBytecodeSourceRelativeOffsetTest is BytecodeTest {
             LibBytecodeSlow.sourceRelativeOffsetSlow(bytecode, sourceIndex)
         );
     }
+
+    /// The relative offset is a 16 bit big-endian value, so its high byte is
+    /// load-bearing. These cases pin offsets that do not fit in a single byte
+    /// (>= 0x100). A mask that dropped the high byte would read a different,
+    /// smaller offset. `sourceRelativeOffset` does not validate that the offset
+    /// points anywhere real (that is `checkNoOOBPointers`' job), so the offset
+    /// bytes can be set directly without a conforming body.
+    function testSourceRelativeOffsetHighByte() external pure {
+        // count = 2, source 0 offset 0x0000, source 1 offset 0x0102 (258).
+        assertEq(LibBytecode.sourceRelativeOffset(hex"0200000102", 1), 0x0102);
+        // count = 1, source 0 offset 0xFF00 (65280): the value lives entirely
+        // in the high byte, so dropping it would read 0.
+        assertEq(LibBytecode.sourceRelativeOffset(hex"01FF00", 0), 0xFF00);
+        // count = 1, source 0 offset 0xFFFF (65535): full 16 bits set.
+        assertEq(LibBytecode.sourceRelativeOffset(hex"01FFFF", 0), 0xFFFF);
+    }
+
+    /// Reference cross-check for high (>= 0x100) offsets. The slow
+    /// implementation independently reads both offset bytes, so it diverges
+    /// from any production read that drops the high byte.
+    function testSourceRelativeOffsetHighByteReference(uint16 offset) external pure {
+        vm.assume(offset >= 0x100);
+        // count = 1, single offset taken from the fuzzed high value.
+        bytes memory bytecode = new bytes(3);
+        bytecode[0] = bytes1(uint8(1));
+        bytecode[1] = bytes1(uint8(offset >> 8));
+        bytecode[2] = bytes1(uint8(offset));
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, 0), offset);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, 0), LibBytecodeSlow.sourceRelativeOffsetSlow(bytecode, 0));
+    }
 }

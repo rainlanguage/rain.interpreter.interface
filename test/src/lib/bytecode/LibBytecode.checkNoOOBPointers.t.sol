@@ -385,4 +385,42 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
         vm.expectRevert(abi.encodeWithSelector(StackSizingsNotMonotonic.selector, bytecode, offset));
         this.checkNoOOBPointersExternal(bytecode);
     }
+
+    /// Boundary: when the bytecode length is exactly `1 + sourceCount * 2`, the
+    /// offset pointer table fills the bytecode with zero room for any source
+    /// header. The offset-table bounds check `sourcesRelativeStart >
+    /// bytecode.length` is `false` at this exact length (it only fires when the
+    /// offsets themselves are truncated), so execution proceeds and the missing
+    /// 4 byte header is caught downstream as `TruncatedHeader` rather than
+    /// `TruncatedHeaderOffsets`. This pins the `>` boundary: a `>=` guard would
+    /// short-circuit here and revert with `TruncatedHeaderOffsets` instead.
+    function testCheckNoOOBPointersOffsetsExactNoHeaderRoomCount1() external {
+        // count = 1, sourcesRelativeStart = 1 + 1 * 2 = 3, length = 3.
+        // [01][offset_hi=00][offset_lo=00]
+        bytes memory bytecode = hex"010000";
+        vm.expectRevert(abi.encodeWithSelector(TruncatedHeader.selector, bytecode));
+        this.checkNoOOBPointersExternal(bytecode);
+    }
+
+    /// As above with count = 2: sourcesRelativeStart = 1 + 2 * 2 = 5, length 5.
+    /// [02][off0_hi=00][off0_lo=00][off1_hi=00][off1_lo=00]
+    function testCheckNoOOBPointersOffsetsExactNoHeaderRoomCount2() external {
+        bytes memory bytecode = hex"0200000000";
+        vm.expectRevert(abi.encodeWithSelector(TruncatedHeader.selector, bytecode));
+        this.checkNoOOBPointersExternal(bytecode);
+    }
+
+    /// Fuzz the boundary across all valid source counts. A bytecode that is
+    /// exactly the count byte plus `count * 2` zeroed offset bytes (and nothing
+    /// else) MUST revert with `TruncatedHeader`, never `TruncatedHeaderOffsets`.
+    function testCheckNoOOBPointersOffsetsExactNoHeaderRoomFuzz(uint8 sourceCount) external {
+        sourceCount = uint8(bound(sourceCount, 1, type(uint8).max));
+        // 1 count byte + 2 bytes per source offset, no source headers.
+        bytes memory bytecode = new bytes(1 + uint256(sourceCount) * 2);
+        bytecode[0] = bytes1(sourceCount);
+        // All offset bytes remain zero, which is well-formed for the offset
+        // table (the first offset must be zero) but leaves no header room.
+        vm.expectRevert(abi.encodeWithSelector(TruncatedHeader.selector, bytecode));
+        this.checkNoOOBPointersExternal(bytecode);
+    }
 }
